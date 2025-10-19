@@ -1,0 +1,36 @@
+<!-- templates/core/menu.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Меню | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/menu.css' %}">
+</head>
+<body>
+    <div class="header">
+    <span class="header-title">ECHO Corp.</span>
+    <a href="{% url 'profile' %}" class="profile-button">👤</a>
+</div>
+    <div class="full-screen-menu">
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Поиск...">
+            <button class="search-btn">🔍</button>
+        </div>
+
+        <div class="menu-grid">
+            {% for dish in dishes %}
+                <a href="{% url 'dish_detail' dish.id %}" class="dish-card-link">
+                    <div class="dish-card">
+                        <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">
+                        <div class="dish-info">
+                            <h3 class="dish-name">{{ dish.name }}</h3>
+                            <p class="dish-price">{{ dish.price }}₽</p>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

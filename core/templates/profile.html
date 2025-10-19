@@ -1,0 +1,32 @@
+<!-- templates/core/profile.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Профиль | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/profile.css' %}">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <a href="{% url 'login' %}" class="profile-button">👤</a>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h2>Данные профиля</h2>
+            <form method="post">
+                {% csrf_token %}
+                <input type="text" value="Название фирмы" readonly><br>
+                <input type="text" value="Телефон" readonly><br>
+                <input type="email" value="Почта" readonly><br>
+                <input type="password" value="Пароль" readonly><br>
+                <div class="footer-links">
+                    <a href="{% url 'agreement' %}" class="agreement-link">Договор/соглашение</a>
+                    <button type="submit" class="logout-button">Выйти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

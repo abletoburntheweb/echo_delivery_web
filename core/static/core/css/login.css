@@ -1,0 +1,92 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdf9f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.header {
+    width: 100%;
+    background-color: #8b6a50;
+    color: white;
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 24px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #b79d80;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 350px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.container h2 {
+    margin-top: 0;
+    color: white;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: white;
+    color: #333;
+    font-family: inherit;
+}
+
+button {
+    background-color: #8b6a50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #7a5c45;
+}
+
+/* === Стили для ссылок === */
+.register-link {
+    margin-top: 15px;
+    color: white;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.register-link:hover {
+    text-decoration: underline;
+}

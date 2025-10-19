@@ -1,0 +1,137 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdf9f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.header {
+    width: 100%;
+    background-color: #8b6a50;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+}
+
+.profile-button {
+    background-color: #7a5c45;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.profile-button:hover {
+    background-color: #6a4c3a;
+}
+
+.faq-full-container {
+    flex-grow: 1;
+    background-color: white;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+}
+
+.back-button {
+    align-self: flex-start;
+    background-color: #8b6a50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    margin-bottom: 15px;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #7a5c45;
+}
+
+.faq-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #8b6a50;
+    text-align: center;
+}
+
+.faq-content {
+    width: 100%;
+    max-width: 500px;
+    flex-grow: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.faq-list {
+    width: 100%;
+}
+
+.faq-item {
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.faq-question {
+    background-color: #8b6a50;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 15px;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: inline-block;
+}
+
+.faq-question:hover {
+    background-color: #7a5c45;
+}
+
+.faq-answer {
+    margin-top: 8px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    color: #333;
+    border-radius: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    border: 1px solid #ddd;
+}
+
+.contact-box {
+    background-color: #8b6a50;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
