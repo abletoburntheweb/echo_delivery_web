@@ -5,22 +5,20 @@
     <meta charset="UTF-8">
     <title>Админ Календарь | ECHO Corp.</title>
     {% load static %}
-    <!-- Подключаем админский CSS -->
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_calendar.css' %}">
-    <!-- Если нужно, можно подключить пользовательский CSS поверх, но обычно админский перекрывает -->
-    <!-- <link rel="stylesheet" type="text/css" href="{% static 'core/css/calendar.css' %}"> -->
 </head>
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
-        <!-- Ссылка на стандартную админку Django -->
-        <a href="{% url 'admin:index' %}" class="profile-button">⚙️</a> <!-- Иконка на выбор -->
+        <div class="header-buttons">
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+        </div>
     </div>
     <div class="main-content">
         <div class="container">
             <div class="calendar-header">
                 <h2 class="month-header">{{ month_name|capfirst }}</h2>
-                <!-- FAQ убран -->
             </div>
             <div class="weekdays-grid">
                 <div class="weekday">Пн</div>
@@ -44,14 +42,12 @@
             <form id="calendar-form" method="post">
                 {% csrf_token %}
                 <input type="hidden" id="selected-date" name="selected_date" value="">
-                <!-- Теперь используем 'admin_cart' -->
                 <button class="accept-button" type="submit" onclick="window.location.href='{% url 'admin_cart' %}'; return false;">Принять</button>
             </form>
         </div>
     </div>
 
     <script>
-        // Скрипт остается тем же
         document.addEventListener('DOMContentLoaded', function() {
             const dayButtons = document.querySelectorAll('.day-btn');
             const selectedDateInput = document.getElementById('selected-date');

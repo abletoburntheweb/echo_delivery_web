@@ -1,9 +1,7 @@
 /* static/core/css/admin_cart.css */
-
-/* Общий фон */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5; /* Светло-серый фон админки */
+    background-color: #f5f5f5;
     margin: 0;
     padding: 0;
     display: flex;
@@ -13,10 +11,10 @@ body {
     box-sizing: border-box;
 }
 
-/* Шапка */
+
 .header {
     width: 100%;
-    background-color: #2c3e50; /* Темно-синий/серый админки */
+    background-color: #2c3e50;
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -31,8 +29,13 @@ body {
     margin: 0;
 }
 
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .profile-button {
-    background-color: #34495e; /* Более светлый оттенок админки */
     color: white;
     padding: 5px 10px;
     border-radius: 50%;
@@ -44,13 +47,27 @@ body {
     justify-content: center;
     width: 32px;
     height: 32px;
+    border: none;
+    cursor: pointer;
 }
 
-.profile-button:hover {
-    background-color: #1d2c3a; /* Более темный при наведении админки */
+.user-icon {
+    background-color: #34495e;
 }
 
-/* Основной контент */
+.user-icon:hover {
+    background-color: #1d2c3a;
+}
+
+.admin-icon {
+    background-color: #34495e;
+}
+
+.admin-icon:hover {
+    background-color: #1d2c3a;
+}
+
+
 .main-content {
     display: flex;
     justify-content: center;
@@ -61,33 +78,33 @@ body {
     box-sizing: border-box;
 }
 
-/* Контейнер корзины */
+
 .container {
-    background-color: #ecf0f1; /* Светло-серый контейнера админки */
+    background-color: #ecf0f1;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     text-align: center;
-    max-width: 500px; /* Шире, чем календарь */
+    max-width: 500px;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* Заголовок корзины */
+
 .cart-title {
     margin-top: 0;
     margin-bottom: 5px;
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
     font-size: 20px;
     font-weight: bold;
     text-align: left;
 }
 
-/* Кнопка добавления */
+
 .add-item-btn {
     width: 40px;
     height: 40px;
-    background-color: #2c3e50; /* Цвет админки */
+    background-color: #2c3e50;
     color: white;
     border: none;
     border-radius: 50%;
@@ -104,10 +121,10 @@ body {
 }
 
 .add-item-btn:hover {
-    background-color: #1d2c3a; /* Более темный при наведении админки */
+    background-color: #1d2c3a;
 }
 
-/* Список товаров */
+
 .cart-items {
     margin-bottom: 20px;
     text-align: left;
@@ -122,12 +139,12 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 10px 0;
-    border-bottom: 1px solid #2c3e50; /* Цвет границы админки */
+    border-bottom: 1px solid #2c3e50;
 }
 
 .item-name {
     flex: 1;
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
     font-weight: bold;
 }
 
@@ -140,18 +157,18 @@ body {
 .quantity-input {
     width: 60px;
     padding: 5px;
-    border: 1px solid #2c3e50; /* Цвет границы админки */
+    border: 1px solid #2c3e50;
     border-radius: 5px;
     background-color: white;
-    color: #2c3e50; /* Цвет текста админки */
+    color: #2c3e50;
     font-size: 16px;
     text-align: center;
 }
 
-/* Кнопки сохранения и удаления */
+
 .save-btn,
 .remove-btn {
-    background-color: #2c3e50; /* Цвет админки */
+    background-color: #2c3e50;
     color: white;
     border: none;
     width: 25px;
@@ -164,53 +181,53 @@ body {
 }
 
 .remove-btn {
-    background-color: #d9534f; /* Красный цвет оставлен как есть */
+    background-color: #d9534f;
 }
 
 .save-btn:hover {
-    background-color: #1d2c3a; /* Более темный при наведении админки */
+    background-color: #1d2c3a;
 }
 
 .remove-btn:hover {
-    background-color: #c9302c; /* Темнее красного */
+    background-color: #c9302c;
 }
 
 .item-price {
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
 }
 
-/* Сообщение "пусто" */
+
 .empty-cart {
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
     font-size: 18px;
     font-style: italic;
     margin: 30px 0;
 }
 
-/* Итог */
+
 .cart-summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 15px 0;
-    border-top: 2px solid #2c3e50; /* Цвет границы админки */
+    border-top: 2px solid #2c3e50;
     margin-top: 20px;
 }
 
 .total {
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
     font-size: 18px;
     font-weight: bold;
 }
 
 .total-amount {
     font-size: 20px;
-    color: #7f8c8d; /* Нейтральный серый для суммы */
+    color: #7f8c8d;
 }
 
-/* Кнопка "Время" (или "Чек") */
+
 .time-button {
-    background-color: #2c3e50; /* Цвет админки */
+    background-color: #2c3e50;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -224,5 +241,5 @@ body {
 }
 
 .time-button:hover {
-    background-color: #1d2c3a; /* Более темный при наведении админки */
+    background-color: #1d2c3a;
 }

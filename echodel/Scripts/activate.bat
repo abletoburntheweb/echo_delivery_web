@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Users\kolbi\OneDrive\Рабочий стол\pyprojects\EchoDel\echodel
+set VIRTUAL_ENV=C:\Users\79127\Desktop\pyprojects\EchoDel\echo_delivery_web\echodel
 
 if not defined PROMPT set PROMPT=$P$G
 

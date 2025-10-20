@@ -8,7 +8,6 @@ from datetime import datetime, timedelta
 def login_view(request):
     if request.user.is_authenticated:
         if request.user.is_superuser:
-            # Теперь направляем на админский календарь, а не на стандартную админку
             return redirect('admin_calendar')
         else:
             return redirect('calendar')
@@ -77,7 +76,6 @@ def calendar_view(request):
     })
 @user_passes_test(lambda u: u.is_superuser)
 def admin_calendar_view(request):
-    # Повторяем логику из calendar_view
     today = datetime.now().date()
     days = []
     for i in range(14):
@@ -98,9 +96,7 @@ def admin_calendar_view(request):
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
                 print(f"Дата выбрана (админ): {selected_date}")
                 request.session['selected_date'] = selected_date_str
-                # Перенаправляем на админскую корзину (пока на общую, если админской нет)
-                # Или на admin_receipt, если админский чек тоже нужен
-                return redirect('admin_cart') # или 'admin_receipt' если он будет
+                return redirect('admin_cart')
             except ValueError:
                 print("Неверный формат даты")
                 pass
@@ -113,7 +109,6 @@ def admin_calendar_view(request):
         except ValueError:
             pass
 
-    # Отличие: рендерим admin_calendar.html
     return render(request, 'admin_calendar.html', {
         'days': days,
         'month_name': month_name,
@@ -127,13 +122,10 @@ def cart_view(request):
     if not cart_items:
         cart_items = None
 
-    # Проверяем, админ ли пользователь
     if request.user.is_superuser:
-        # Так как шаблон в core/templates/, используем просто 'admin_cart.html'
         template_name = 'admin_cart.html'
     else:
-        # Обычный шаблон, если он тоже в core/templates/
-        template_name = 'cart.html' # Убедитесь, что cart.html тоже в core/templates/
+        template_name = 'cart.html'
 
     return render(request, template_name, {
         'cart_items': cart_items,
@@ -160,7 +152,6 @@ def update_cart(request):
 
         request.session['cart'] = cart
 
-    # --- Изменение логики редиректа ---
     referer = request.META.get('HTTP_REFERER', '')
     if 'admin/cart' in referer:
         return redirect('admin_cart')
@@ -246,13 +237,10 @@ def menu_view(request):
     ]
 
     return render(request, 'menu.html', {'dishes': dishes})
-# --- Новая функция для админского меню ---
 @user_passes_test(lambda u: u.is_superuser)
-@login_required # Декоратор login_required нужен, так как user_passes_test не проверяет аутентификацию сам
+@login_required
 def admin_menu_view(request):
     dishes = [
-        # ... (тот же список блюд, что и в menu_view) ...
-        # В будущем можно подгружать из базы данных через модель Dish
         {
             'id': 1,
             'name': 'Блюдо 1',
@@ -330,7 +318,6 @@ def admin_menu_view(request):
     return render(request, 'admin_menu.html', {'dishes': dishes})
 
 def _get_dish_by_id(dish_id):
-    """Возвращает словарь с данными блюда по его ID или None, если не найдено."""
     dishes = [
         {
             'id': 1,
@@ -388,19 +375,26 @@ def dish_detail_view(request, dish_id):
         return HttpResponse("Блюдо не найдено", status=404)
 
     print(f"Найдено блюдо: {dish}")
-    # Убедитесь, что имя шаблона именно 'dish_detail.html', а не 'core/dish_detail.html'
     return render(request, 'dish_detail.html', {'dish': dish})
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dish_detail_view(request, dish_id):
-    print(f"admin_dish_detail_view вызвана для dish_id: {dish_id}") # Добавьте это
+    print(f"admin_dish_detail_view вызвана для dish_id: {dish_id}")
     dish = _get_dish_by_id(dish_id)
     if not dish:
         return HttpResponse("Блюдо не найдено", status=404)
 
-    print(f"Рендерим admin_dish_detail.html") # Добавьте это
-    # Рендерим админский шаблон (должен быть в core/templates/)
-    return render(request, 'admin_dish_detail.html', {'dish': dish})
+    previous_url = request.META.get('HTTP_REFERER', '')
+
+    if not previous_url or not previous_url.startswith('/admin/'):
+        previous_url = reverse('admin_menu')
+
+    print(f"Рендерим admin_dish_detail.html. Предыдущая страница: {previous_url}")
+
+    return render(request, 'admin_dish_detail.html', {
+        'dish': dish,
+        'previous_url': previous_url
+    })
 
 @login_required
 def add_to_cart(request):
@@ -472,7 +466,12 @@ def profile_view(request):
         logout(request)
         return redirect('login')
 
-    return render(request, 'profile.html')
+    if request.user.is_superuser:
+        template_name = 'admin_profile.html'
+    else:
+        template_name = 'profile.html'
+
+    return render(request, template_name)
 
 @login_required
 def agreement_view(request):

@@ -1,4 +1,4 @@
-<!-- templates/dish_detail.html -->
+<!-- templates/admin_dish_detail.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,18 +10,33 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+        </div>
     </div>
     <div class="full-screen-menu">
-        <a href="{% url 'menu' %}" class="back-button">Назад</a>
+        <a href="{{ previous_url }}" class="back-button">Назад</a>
 
         <div class="dish-detail-card">
-            <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">
+            <div class="dish-header">
+                <h2 class="dish-name">{{ dish.name }}</h2>
+                <button class="save-button">Сохранить</button>
+            </div>
+
+            <div class="image-container">
+                <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">
+            </div>
 
             <div class="dish-content">
-                <h2 class="dish-name">{{ dish.name }}</h2>
-                <p class="dish-description">
-                    {{ dish.description }}
-                </p>
+                <input type="text" class="dish-name-input" value="{{ dish.name }}" placeholder="Имя блюда">
+
+                <textarea class="dish-description-input" placeholder="Описание блюда">{{ dish.description }}</textarea>
+
+                <div class="price-container">
+                    <label for="dish-price">Цена:</label>
+                    <input type="number" id="dish-price" class="dish-price-input" value="{{ dish.price }}" step="0.01" placeholder="Цена">
+                </div>
 
                 <div class="action-buttons">
                     <form method="post" action="{% url 'add_to_cart' %}">
@@ -36,7 +51,7 @@
                             <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-input">
                         </div>
 
-                        <button type="submit" class="add-button">Добавить</button>
+                        <button type="submit" class="add-button">Добавить в корзину</button>
                     </form>
                 </div>
             </div>

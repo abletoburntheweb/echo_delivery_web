@@ -5,21 +5,21 @@
     <meta charset="UTF-8">
     <title>Админ Корзина | ECHO Corp.</title>
     {% load static %}
-    <!-- Подключаем админский CSS для корзины -->
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_cart.css' %}">
 </head>
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
-        <!-- Ссылка на стандартную админку Django -->
-        <a href="{% url 'admin:index' %}" class="profile-button">⚙️</a>
+        <div class="header-buttons">
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+        </div>
     </div>
     <div class="main-content">
         <div class="container">
             <h2 class="cart-title">Админ Корзина ({{ item_count }} позиции)</h2>
 
-            <!-- Ссылка на обычное меню -->
-            <a href="{% url 'admin_menu' %}" class="add-item-btn">+</a> <!-- Изменено на 'menu' -->
+            <a href="{% url 'admin_menu' %}" class="add-item-btn">+</a>
 
             {% if cart_items %}
                 <div class="cart-items">
@@ -49,8 +49,7 @@
                 <div class="total">
                     Итого: <span class="total-amount">{{ total|floatformat:2 }}₽</span>
                 </div>
-                <!-- Ссылка на обычный чек -->
-                <a href="{% url 'receipt' %}" class="time-button">Время</a> <!-- Изменено на 'receipt' -->
+                <a href="{% url 'receipt' %}" class="time-button">Время</a>
             </div>
         </div>
     </div>

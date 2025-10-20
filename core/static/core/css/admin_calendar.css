@@ -1,8 +1,7 @@
 /* static/core/css/admin_calendar.css */
 body {
     font-family: Arial, sans-serif;
-    /* Можно изменить фон, например, на более нейтральный */
-    background-color: #f5f5f5; /* Светло-серый фон для админки */
+    background-color: #f5f5f5;
     margin: 0;
     padding: 0;
     display: flex;
@@ -14,8 +13,7 @@ body {
 
 .header {
     width: 100%;
-    /* Изменим цвет фона для админки */
-    background-color: #2c3e50; /* Темно-синий/серый */
+    background-color: #2c3e50;
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -30,9 +28,13 @@ body {
     margin: 0;
 }
 
-/* Можно изменить стиль кнопки профиля/админки */
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
 .profile-button {
-    background-color: #34495e; /* Более светлый оттенок */
     color: white;
     padding: 5px 10px;
     border-radius: 50%;
@@ -44,10 +46,25 @@ body {
     justify-content: center;
     width: 32px;
     height: 32px;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
 }
 
-.profile-button:hover {
-    background-color: #1d2c3a; /* Более темный при наведении */
+.user-icon {
+    background-color: #34495e;
+}
+
+.user-icon:hover {
+    background-color: #1d2c3a;
+}
+
+.admin-icon {
+    background-color: #34495e;
+}
+
+.admin-icon:hover {
+    background-color: #1d2c3a;
 }
 
 .main-content {
@@ -61,8 +78,7 @@ body {
 }
 
 .container {
-    /* Можно изменить цвет фона контейнера */
-    background-color: #ecf0f1; /* Светло-серый */
+    background-color: #ecf0f1;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -75,7 +91,7 @@ body {
 .month-header {
     margin-top: 0;
     margin-bottom: 10px;
-    color: #2c3e50; /* Темный цвет текста */
+    color: #2c3e50;
     font-size: 20px;
     font-weight: bold;
 }
@@ -93,7 +109,7 @@ body {
 
 .weekday {
     font-weight: bold;
-    color: #2c3e50; /* Темный цвет для дней недели */
+    color: #2c3e50;
     font-size: 14px;
     width: 40px;
     display: flex;
@@ -129,7 +145,7 @@ body {
     justify-content: center;
     font-weight: bold;
     font-size: 16px;
-    color: #2c3e50; /* Темный цвет текста */
+    color: #2c3e50;
     cursor: pointer;
     transition: background-color 0.2s, transform 0.1s, border 0.2s;
     border: 2px solid transparent;
@@ -141,7 +157,7 @@ body {
 }
 
 .day-btn:hover {
-    border: 2px solid #34495e; /* Цвет границы при наведении */
+    border: 2px solid #34495e;
     border-radius: 50%;
 }
 
@@ -150,14 +166,14 @@ body {
 }
 
 .day-btn.selected {
-    background-color: #2c3e50; /* Темный фон для выбранного дня */
+    background-color: #2c3e50;
     color: white;
-    border: 2px solid #34495e; /* Граница выбранного дня */
+    border: 2px solid #34495e;
     border-radius: 50%;
 }
 
 .accept-button {
-    background-color: #2c3e50; /* Темный цвет кнопки */
+    background-color: #2c3e50;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -170,7 +186,7 @@ body {
 }
 
 .accept-button:hover {
-    background-color: #1d2c3a; /* Более темный при наведении */
+    background-color: #1d2c3a;
 }
 
 .calendar-actions {
@@ -182,7 +198,7 @@ body {
 }
 
 .faq-button {
-    background-color: #2c3e50; /* Темный цвет для FAQ */
+    background-color: #2c3e50;
     color: white;
     padding: 8px 12px;
     border-radius: 20px;
@@ -192,5 +208,5 @@ body {
 }
 
 .faq-button:hover {
-    background-color: #1d2c3a; /* Более темный при наведении */
+    background-color: #1d2c3a;
 }

@@ -10,10 +10,12 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
-        <a href="{% url 'admin:index' %}" class="profile-button">⚙️</a> <!-- Ссылка на стандартную админку -->
+        <div class="header-buttons">
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+        </div>
     </div>
     <div class="full-screen-menu">
-        <!-- Кнопка "Добавить" над контейнером с меню -->
         <button class="add-dish-btn">Добавить</button>
 
         <div class="search-bar">
@@ -23,7 +25,6 @@
 
         <div class="menu-grid">
             {% for dish in dishes %}
-                <!-- ИСПРАВЛЕНО: использует админский URL admin_dish_detail -->
                 <a href="{% url 'admin_dish_detail' dish.id %}" class="dish-card-link">
                     <div class="dish-card">
                         <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">

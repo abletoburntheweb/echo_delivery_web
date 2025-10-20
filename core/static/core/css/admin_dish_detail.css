@@ -2,7 +2,7 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5; /* Светло-серый фон админки */
+    background-color: #f5f5f5;
     margin: 0;
     padding: 0;
     display: flex;
@@ -11,15 +11,61 @@ body {
     box-sizing: border-box;
 }
 
+
 .header {
     width: 100%;
-    background-color: #2c3e50; /* Темно-синий/серый админки */
+    background-color: #2c3e50;
     color: white;
     padding: 15px 20px;
-    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 24px;
     font-weight: bold;
     box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.profile-button {
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.user-icon {
+    background-color: #34495e;
+}
+
+.user-icon:hover {
+    background-color: #1d2c3a;
+}
+
+.admin-icon {
+    background-color: #34495e;
+}
+
+.admin-icon:hover {
+    background-color: #1d2c3a;
 }
 
 .full-screen-menu {
@@ -33,7 +79,7 @@ body {
 }
 
 .back-button {
-    background-color: #2c3e50; /* Цвет админки */
+    background-color: #2c3e50;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -43,15 +89,15 @@ body {
     margin-bottom: 20px;
     text-decoration: none;
     transition: background-color 0.2s;
-    display: inline-block; /* Чтобы работало выравнивание */
+    display: inline-block;
 }
 
 .back-button:hover {
-    background-color: #1d2c3a; /* Темнее админки */
+    background-color: #1d2c3a;
 }
 
 .dish-detail-card {
-    background-color: #ecf0f1; /* Светло-серый контейнера админки */
+    background-color: #ecf0f1;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 20px;
@@ -59,9 +105,40 @@ body {
     max-width: 800px;
     display: flex;
     gap: 20px;
-    align-items: flex-start; /* Выравнивание по верхнему краю */
+    align-items: flex-start;
     overflow: hidden;
-    flex-direction: column; /* Изменили на колонку для удобства редактирования */
+    flex-direction: column;
+    position: relative;
+}
+
+.dish-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.dish-name {
+    margin: 0;
+    font-size: 24px;
+    color: #2c3e50;
+}
+
+.save-button {
+    background-color: #2c3e50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    align-self: flex-start;
+}
+
+.save-button:hover {
+    background-color: #1d2c3a;
 }
 
 .image-container {
@@ -81,31 +158,31 @@ body {
 
 .dish-content {
     width: 100%;
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Отступ между элементами */
+    gap: 15px;
 }
 
 .dish-name-input, .dish-description-input, .dish-price-input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #2c3e50; /* Цвет границы админки */
+    border: 1px solid #2c3e50;
     border-radius: 5px;
     background-color: white;
-    color: #2c3e50; /* Цвет текста админки */
+    color: #2c3e50;
     font-size: 16px;
     box-sizing: border-box;
 }
 
 .dish-name-input:focus, .dish-description-input:focus, .dish-price-input:focus {
     outline: none;
-    border-color: #1d2c3a; /* Более темный цвет границы при фокусе */
+    border-color: #1d2c3a;
 }
 
 .dish-description-input {
-    resize: vertical; /* Позволяет изменять высоту по вертикали */
-    min-height: 100px; /* Минимальная высота для textarea */
+    resize: vertical;
+    min-height: 100px;
 }
 
 .price-container {
@@ -116,23 +193,36 @@ body {
 
 .price-container label {
     font-weight: bold;
-    color: #2c3e50; /* Темный цвет текста админки */
+    color: #2c3e50;
 }
 
 .dish-price-input {
-    width: auto; /* Ширина под значение */
-    align-self: flex-start; /* Прижать к левому краю */
+    width: auto;
+    align-self: flex-start;
 }
 
-.save-button-container {
+
+
+.quantity-controls {
     display: flex;
-    justify-content: flex-end; /* Кнопка "Сохранить" справа */
-    width: 100%;
-    margin-top: 15px; /* Отступ сверху */
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.save-button {
-    background-color: #2c3e50; /* Цвет админки */
+.quantity-input {
+    width: 60px;
+    padding: 5px;
+    border: 1px solid #2c3e50;
+    border-radius: 5px;
+    background-color: white;
+    color: #2c3e50;
+    font-size: 16px;
+    text-align: center;
+}
+
+.add-button {
+    background-color: #2c3e50;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -142,6 +232,13 @@ body {
     transition: background-color 0.2s;
 }
 
-.save-button:hover {
-    background-color: #1d2c3a; /* Темнее админки */
+.add-button:hover {
+    background-color: #1d2c3a;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
 }

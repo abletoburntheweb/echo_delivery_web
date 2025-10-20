@@ -38,7 +38,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV="C:\Users\kolbi\OneDrive\Рабочий стол\pyprojects\EchoDel\echodel"
+VIRTUAL_ENV="C:\Users\79127\Desktop\pyprojects\EchoDel\echo_delivery_web\echodel"
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
