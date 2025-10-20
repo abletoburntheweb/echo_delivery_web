@@ -135,6 +135,7 @@ body {
 .day-btn:hover {
     border: 2px solid white;
     border-radius: 50%;
+}
 
 .day-btn:active {
     transform: scale(0.95);
@@ -163,6 +164,7 @@ body {
 .accept-button:hover {
     background-color: #7a5c45;
 }
+
 .calendar-actions {
     display: flex;
     justify-content: space-between;
@@ -183,17 +185,4 @@ body {
 
 .faq-button:hover {
     background-color: #7a5c45;
-}
-.faq-button {
-    background-color: #7a5c45;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 14px;
-    transition: background-color 0.2s;
-}
-
-.faq-button:hover {
-    background-color: #6a4c3a;
 }

@@ -44,51 +44,47 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dayButtons = document.querySelectorAll('.day-btn');
-            const selectedDateInput = document.getElementById('selected-date');
-            let selectedButton = null;
+   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dayButtons = document.querySelectorAll('.day-btn');
+        const selectedDateInput = document.getElementById('selected-date');
+        let selectedButton = null;
 
-            function selectDay(button) {
-                // Снимаем класс selected с предыдущего выбранного элемента
-                if (selectedButton) {
-                    selectedButton.classList.remove('selected');
-                }
+        function selectDay(button) {
+            // Снимаем класс selected со всех кнопок
+            dayButtons.forEach(btn => btn.classList.remove('selected'));
 
-                // Добавляем класс selected к переданному элементу
-                button.classList.add('selected');
-                selectedButton = button;
+            // Добавляем класс selected к выбранной кнопке
+            button.classList.add('selected');
+            selectedButton = button;
 
-                // Сохраняем выбранную дату в скрытое поле формы
-                const dateValue = button.getAttribute('data-date');
-                selectedDateInput.value = dateValue;
-                console.log('Выбрана дата:', dateValue); // Для отладки
-            }
+            // Сохраняем выбранную дату в скрытое поле формы
+            const dateValue = button.getAttribute('data-date');
+            selectedDateInput.value = dateValue;
+            console.log('Выбрана дата:', dateValue);
+        }
 
-            dayButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    selectDay(this);
-                });
+        dayButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                selectDay(this);
             });
-
-            if (selectedDateInput.value) {
-                // Если есть, находим соответствующую кнопку и "выбираем" её
-                const previouslySelectedButton = document.querySelector(`.day-btn[data-date="${selectedDateInput.value}"]`);
-                if (previouslySelectedButton) {
-                    selectDay(previouslySelectedButton);
-                }
-            } else {
-                // Если нет, ищем кнопку с классом 'selected' (это будет сегодняшний день, если он подсвечен сервером)
-                const todayButton = document.querySelector('.day-btn.selected');
-                if (todayButton) {
-                    // Убираем класс 'selected', чтобы не было дублирования стиля
-                    todayButton.classList.remove('selected');
-                    // Выбираем её как "по умолчанию"
-                    selectDay(todayButton);
-                }
-            }
         });
-    </script>
+
+        if (selectedDateInput.value) {
+            // Если есть, находим соответствующую кнопку и "выбираем" её
+            const previouslySelectedButton = document.querySelector(`.day-btn[data-date="${selectedDateInput.value}"]`);
+            if (previouslySelectedButton) {
+                selectDay(previouslySelectedButton);
+            }
+        } else {
+            // Если нет, выбираем сегодняшний день
+            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const todayButton = document.querySelector(`.day-btn[data-date="${today}"]`);
+            if (todayButton) {
+                selectDay(todayButton);
+            }
+        }
+    });
+</script>
 </body>
 </html>
