@@ -20,6 +20,11 @@ from django.urls import path, include
 from core import views
 
 urlpatterns = [
+    path('admin/calendar/', views.admin_calendar_view, name='admin_calendar'),
+    path('admin/cart/', views.cart_view, name='admin_cart'),
+    path('admin/menu/', views.admin_menu_view, name='admin_menu'),
+    path('admin/dish/<int:dish_id>/', views.admin_dish_detail_view, name='admin_dish_detail'),
+    #path('admin/receipt/', views.admin_receipt_view, name='admin_receipt'),
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
 ]

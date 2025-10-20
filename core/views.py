@@ -1,4 +1,4 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
@@ -7,7 +7,11 @@ from datetime import datetime, timedelta
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('calendar')
+        if request.user.is_superuser:
+            # Теперь направляем на админский календарь, а не на стандартную админку
+            return redirect('admin_calendar')
+        else:
+            return redirect('calendar')
 
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -15,7 +19,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('calendar')
+            if user.is_superuser:
+                # И сюда тоже
+                return redirect('admin_calendar')
+            else:
+                return redirect('calendar')
         else:
             return HttpResponse("Неверный логин или пароль")
     else:
@@ -67,21 +75,72 @@ def calendar_view(request):
         'month_name': month_name,
         'selected_date': selected_date
     })
+@user_passes_test(lambda u: u.is_superuser)
+def admin_calendar_view(request):
+    # Повторяем логику из calendar_view
+    today = datetime.now().date()
+    days = []
+    for i in range(14):
+        day = today + timedelta(days=i)
+        days.append({
+            'date': day,
+            'weekday': day.weekday(),
+            'is_today': day == today
+        })
+
+    month_name = today.strftime('%B')
+    selected_date_str = None
+
+    if request.method == 'POST':
+        selected_date_str = request.POST.get('selected_date')
+        if selected_date_str:
+            try:
+                selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+                print(f"Дата выбрана (админ): {selected_date}")
+                request.session['selected_date'] = selected_date_str
+                # Перенаправляем на админскую корзину (пока на общую, если админской нет)
+                # Или на admin_receipt, если админский чек тоже нужен
+                return redirect('admin_cart') # или 'admin_receipt' если он будет
+            except ValueError:
+                print("Неверный формат даты")
+                pass
+
+    selected_date_str = request.session.get('selected_date')
+    selected_date = None
+    if selected_date_str:
+        try:
+            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+
+    # Отличие: рендерим admin_calendar.html
+    return render(request, 'admin_calendar.html', {
+        'days': days,
+        'month_name': month_name,
+        'selected_date': selected_date
+    })
 
 @login_required
 def cart_view(request):
     cart_items = request.session.get('cart', [])
-
     total = sum(item['quantity'] * item['price'] for item in cart_items)
-
     if not cart_items:
         cart_items = None
 
-    return render(request, 'cart.html', {
+    # Проверяем, админ ли пользователь
+    if request.user.is_superuser:
+        # Так как шаблон в core/templates/, используем просто 'admin_cart.html'
+        template_name = 'admin_cart.html'
+    else:
+        # Обычный шаблон, если он тоже в core/templates/
+        template_name = 'cart.html' # Убедитесь, что cart.html тоже в core/templates/
+
+    return render(request, template_name, {
         'cart_items': cart_items,
         'total': total,
         'item_count': len(cart_items) if cart_items else 0
     })
+
 @login_required
 def update_cart(request):
     if request.method == 'POST':
@@ -101,7 +160,13 @@ def update_cart(request):
 
         request.session['cart'] = cart
 
-    return redirect('cart')
+    # --- Изменение логики редиректа ---
+    referer = request.META.get('HTTP_REFERER', '')
+    if 'admin/cart' in referer:
+        return redirect('admin_cart')
+    else:
+        return redirect('cart')
+
 
 @login_required
 def menu_view(request):
@@ -181,59 +246,161 @@ def menu_view(request):
     ]
 
     return render(request, 'menu.html', {'dishes': dishes})
+# --- Новая функция для админского меню ---
+@user_passes_test(lambda u: u.is_superuser)
+@login_required # Декоратор login_required нужен, так как user_passes_test не проверяет аутентификацию сам
+def admin_menu_view(request):
+    dishes = [
+        # ... (тот же список блюд, что и в menu_view) ...
+        # В будущем можно подгружать из базы данных через модель Dish
+        {
+            'id': 1,
+            'name': 'Блюдо 1',
+            'price': 250,
+            'image': 'https://via.placeholder.com/300x200?text=Блюдо+1'
+        },
+        {
+            'id': 2,
+            'name': 'Блюдо 2',
+            'price': 320,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+2'
+        },
+        {
+            'id': 3,
+            'name': 'Блюдо 3',
+            'price': 180,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+3'
+        },
+        {
+            'id': 4,
+            'name': 'Блюдо 4',
+            'price': 450,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+4'
+        },
+        {
+            'id': 5,
+            'name': 'Блюдо 5',
+            'price': 290,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+5'
+        },
+        {
+            'id': 6,
+            'name': 'Блюдо 6',
+            'price': 380,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+6'
+        },
+        {
+            'id': 7,
+            'name': 'Блюдо 7',
+            'price': 250,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+7'
+        },
+        {
+            'id': 8,
+            'name': 'Блюдо 8',
+            'price': 320,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+8'
+        },
+        {
+            'id': 9,
+            'name': 'Блюдо 9',
+            'price': 180,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+9'
+        },
+        {
+            'id': 10,
+            'name': 'Блюдо 10',
+            'price': 450,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+10'
+        },
+        {
+            'id': 11,
+            'name': 'Блюдо 11',
+            'price': 290,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+11'
+        },
+        {
+            'id': 12,
+            'name': 'Блюдо 12',
+            'price': 380,
+            'image': '  https://via.placeholder.com/300x200?text=Блюдо+12'
+        },
+    ]
+    # Рендерим админский шаблон
+    return render(request, 'admin_menu.html', {'dishes': dishes})
 
-@login_required
-def dish_detail_view(request, dish_id):
+def _get_dish_by_id(dish_id):
+    """Возвращает словарь с данными блюда по его ID или None, если не найдено."""
     dishes = [
         {
             'id': 1,
             'name': 'Плов',
             'price': 250,
             'image': 'https://via.placeholder.com/300x200?text=Плов',
-            'description': 'Состоит из нескольких компонентов, объединённых в единую порцию. Каждый элемент располагается в определённой и взаимодействует с другими в пределах общей структуры.'
+            'description': 'Состоит из нескольких компонентов, объединённых в единую порцию. Каждый элемент располагается в определённой и взаимодействует с другими в пределах обной структуры.'
         },
         {
             'id': 2,
             'name': 'Борщ',
             'price': 320,
-            'image': 'https://via.placeholder.com/300x200?text=Борщ',
+            'image': '  https://via.placeholder.com/300x200?text=Борщ',
             'description': 'Традиционный славянский суп из свеклы, капусты, мяса и специй. Готовится долго, но результат того стоит.'
         },
         {
             'id': 3,
             'name': 'Салат Цезарь',
             'price': 180,
-            'image': 'https://via.placeholder.com/300x200?text=Цезарь',
+            'image': '  https://via.placeholder.com/300x200?text=Цезарь',
             'description': 'Классический салат с курицей, сухариками, пармезаном и соусом Цезарь. Идеально подходит для легкого перекуса.'
         },
         {
             'id': 4,
             'name': 'Пицца Маргарита',
             'price': 450,
-            'image': 'https://via.placeholder.com/300x200?text=Пицца',
+            'image': '  https://via.placeholder.com/300x200?text=Пицца',
             'description': 'Итальянская пицца с томатным соусом, моцареллой и базиликом. Простота и вкус в одном блюде.'
         },
         {
             'id': 5,
             'name': 'Оливье',
             'price': 290,
-            'image': 'https://via.placeholder.com/300x200?text=Оливье',
+            'image': '  https://via.placeholder.com/300x200?text=Оливье',
             'description': 'Новогодний салат из картофеля, моркови, огурцов, яиц и колбасы. Всегда радует своим вкусом.'
         },
         {
             'id': 6,
             'name': 'Суп-пюре из тыквы',
             'price': 380,
-            'image': 'https://via.placeholder.com/300x200?text=Тыква',
+            'image': '  https://via.placeholder.com/300x200?text=Тыква',
             'description': 'Кремовый суп из спелой тыквы с сливками и специями. Тепло и уютно в холодный день.'
         },
     ]
 
-    dish = next((d for d in dishes if d['id'] == int(dish_id)), None)
+    return next((d for d in dishes if d['id'] == int(dish_id)), None)
+
+
+@login_required
+def dish_detail_view(request, dish_id):
+    print(f"Запрошенное dish_id: {dish_id}")
+    dish = _get_dish_by_id(dish_id)
+    if not dish:
+        print(f"Блюдо с ID {dish_id} не найдено")
+        return HttpResponse("Блюдо не найдено", status=404)
+
+    print(f"Найдено блюдо: {dish}")
+    # Убедитесь, что имя шаблона именно 'dish_detail.html', а не 'core/dish_detail.html'
+    return render(request, 'dish_detail.html', {'dish': dish})
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_dish_detail_view(request, dish_id):
+    print(f"admin_dish_detail_view вызвана для dish_id: {dish_id}") # Добавьте это
+    dish = _get_dish_by_id(dish_id)
     if not dish:
         return HttpResponse("Блюдо не найдено", status=404)
 
-    return render(request, 'dish_detail.html', {'dish': dish})
+    print(f"Рендерим admin_dish_detail.html") # Добавьте это
+    # Рендерим админский шаблон (должен быть в core/templates/)
+    return render(request, 'admin_dish_detail.html', {'dish': dish})
 
 @login_required
 def add_to_cart(request):

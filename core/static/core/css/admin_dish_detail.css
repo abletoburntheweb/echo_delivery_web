@@ -1,0 +1,147 @@
+/* static/core/css/admin_dish_detail.css */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5; /* Светло-серый фон админки */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.header {
+    width: 100%;
+    background-color: #2c3e50; /* Темно-синий/серый админки */
+    color: white;
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 24px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.full-screen-menu {
+    flex-grow: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.back-button {
+    background-color: #2c3e50; /* Цвет админки */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    display: inline-block; /* Чтобы работало выравнивание */
+}
+
+.back-button:hover {
+    background-color: #1d2c3a; /* Темнее админки */
+}
+
+.dish-detail-card {
+    background-color: #ecf0f1; /* Светло-серый контейнера админки */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    width: 90%;
+    max-width: 800px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start; /* Выравнивание по верхнему краю */
+    overflow: hidden;
+    flex-direction: column; /* Изменили на колонку для удобства редактирования */
+}
+
+.image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.dish-image {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.dish-content {
+    width: 100%;
+    color: #2c3e50; /* Темный цвет текста админки */
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Отступ между элементами */
+}
+
+.dish-name-input, .dish-description-input, .dish-price-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #2c3e50; /* Цвет границы админки */
+    border-radius: 5px;
+    background-color: white;
+    color: #2c3e50; /* Цвет текста админки */
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.dish-name-input:focus, .dish-description-input:focus, .dish-price-input:focus {
+    outline: none;
+    border-color: #1d2c3a; /* Более темный цвет границы при фокусе */
+}
+
+.dish-description-input {
+    resize: vertical; /* Позволяет изменять высоту по вертикали */
+    min-height: 100px; /* Минимальная высота для textarea */
+}
+
+.price-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.price-container label {
+    font-weight: bold;
+    color: #2c3e50; /* Темный цвет текста админки */
+}
+
+.dish-price-input {
+    width: auto; /* Ширина под значение */
+    align-self: flex-start; /* Прижать к левому краю */
+}
+
+.save-button-container {
+    display: flex;
+    justify-content: flex-end; /* Кнопка "Сохранить" справа */
+    width: 100%;
+    margin-top: 15px; /* Отступ сверху */
+}
+
+.save-button {
+    background-color: #2c3e50; /* Цвет админки */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.save-button:hover {
+    background-color: #1d2c3a; /* Темнее админки */
+}
