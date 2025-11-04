@@ -36,7 +36,7 @@ class Dish(models.Model):
     category = models.ForeignKey(Category, on_delete=models.RESTRICT, db_column='fk_id_cat', verbose_name="Категория")
     name = models.CharField(max_length=255, verbose_name="Название", db_column='name')
     description = models.TextField(verbose_name="Описание", blank=True, null=True, db_column='description')
-    image = models.URLField(verbose_name="Изображение", db_column='img')
+    image = models.ImageField(upload_to='dishes/', verbose_name="Изображение", db_column='img')
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена", default=0.00, db_column='price')
 
     def __str__(self):

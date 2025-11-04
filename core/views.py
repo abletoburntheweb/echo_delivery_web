@@ -1,10 +1,14 @@
+from PIL.Image import Image
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import ProtectedError
 from django.shortcuts import render, redirect, get_object_or_404 
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category 
+from .models import Dish, Category
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -337,17 +341,15 @@ def admin_menu_view(request):
 def update_dish(request, dish_id): 
     if request.method == 'POST':
         try:
-            
             dish = get_object_or_404(Dish, id=dish_id)
 
-            
-            new_name = request.POST.get('name')
-            new_description = request.POST.get('description')
+            new_name = request.POST.get('name', '').strip()
+            new_description = request.POST.get('description', '').strip()
             new_price_str = request.POST.get('price')
+            new_image_file = request.FILES.get('image') 
 
-            
             errors = []
-            if not new_name or new_name.strip() == '':
+            if not new_name:
                 errors.append("Имя не может быть пустым.")
             if not new_price_str:
                 errors.append("Цена не может быть пустой.")
@@ -355,84 +357,91 @@ def update_dish(request, dish_id):
                 try:
                     new_price = float(new_price_str)
                     if new_price < 0:
-                         errors.append("Цена не может быть отрицательной.")
+                        errors.append("Цена не может быть отрицательной.")
                 except ValueError:
                     errors.append("Цена должна быть числом.")
 
+            if new_image_file and not errors:
+                try:
+                    img = Image.open(new_image_file)
+                    img.verify()
+                    new_image_file.seek(0)
+                except Exception:
+                    errors.append("Новый файл не является изображением.")
+
             if errors:
-                
                 return HttpResponse("; ".join(errors), status=400)
 
-            
-            dish.name = new_name.strip()
-            dish.description = new_description 
+            dish.name = new_name
+            dish.description = new_description
             dish.price = new_price
 
-            
-            dish.save()
+            if new_image_file:
+                dish.image = new_image_file
 
-            
-            return HttpResponse("OK", status=200)
+            dish.save()
+            return redirect('admin_menu')
 
         except Exception as e:
-            
             print(f"Ошибка при обновлении блюда {dish_id}: {e}")
             return HttpResponse("Ошибка сервера при сохранении.", status=500)
 
-    else:
-        
-        return HttpResponse("Метод не разрешён.", status=405)
+    return HttpResponse("Метод не разрешён.", status=405)
+
 @login_required
-@user_passes_test(lambda u: u.is_superuser) 
+@user_passes_test(lambda u: u.is_superuser)
 def add_dish_view(request):
     if request.method == 'POST':
         try:
-            
-            name = request.POST.get('name')
-            description = request.POST.get('description', '') 
+            name = request.POST.get('name', '').strip()
+            description = request.POST.get('description', '').strip()
             price_str = request.POST.get('price')
             category_id = request.POST.get('category_id')
-            image_url = request.POST.get('image')
+            image_file = request.FILES.get('image')
 
-            
             errors = []
-            if not name or name.strip() == "":
+            if not name:
                 errors.append("Поле 'Имя' обязательно.")
             if not price_str:
                 errors.append("Поле 'Цена' обязательно.")
             if not category_id:
                 errors.append("Поле 'Категория' обязательно.")
-            if not image_url:
+            if not image_file:
                 errors.append("Поле 'Изображение' обязательно.")
 
-            if errors:
-                return JsonResponse({'success': False, 'errors': errors}, status=400) 
+            price = None
+            if price_str:
+                try:
+                    price = float(price_str)
+                    if price < 0:
+                        errors.append("Цена не может быть отрицательной.")
+                except ValueError:
+                    errors.append("Поле 'Цена' должно быть числом.")
 
-            
-            try:
-                price = float(price_str)
-                if price < 0:
-                    errors.append("Цена не может быть отрицательной.")
-            except ValueError:
-                errors.append("Поле 'Цена' должно быть числом.")
+            category = None
+            if category_id and not errors:
+                try:
+                    category = Category.objects.get(id=category_id)
+                except Category.DoesNotExist:
+                    errors.append("Выбранная категория не существует.")
+
+            if image_file and not errors:
+                try:
+                    img = Image.open(image_file)
+                    img.verify()
+                    image_file.seek(0)
+                except Exception:
+                    errors.append("Загруженный файл не является изображением.")
 
             if errors:
                 return JsonResponse({'success': False, 'errors': errors}, status=400)
 
-            
-            try:
-                category = Category.objects.get(id=category_id)
-            except Category.DoesNotExist:
-                errors.append("Выбранная категория не существует.")
-                return JsonResponse({'success': False, 'errors': errors}, status=400)
-
-            
             new_dish = Dish.objects.create(
-                name=name.strip(), 
-                description=description.strip(),
+                name=name,
+                description=description,
                 price=price,
-                category=category, 
-                image=image_url.strip() 
+                category=category,
+                image=image_file
             )
 
             return JsonResponse({
@@ -442,13 +451,65 @@ def add_dish_view(request):
                     'id': new_dish.id,
                     'name': new_dish.name,
                     'price': str(new_dish.price),
-                    'image': new_dish.image,
+                    'image': new_dish.image.url,
                     'category_id': new_dish.category.id
                 }
             }, status=201)
+
         except Exception as e:
-            print(f"Ошибка при добавлении блюда: {e}") 
+            print(f"Ошибка при добавлении блюда: {e}")
             return JsonResponse({'success': False, 'error': 'Внутренняя ошибка сервера.'}, status=500)
 
-    else:
-        return JsonResponse({'success': False, 'error': 'Метод не разрешён.'}, status=405)
+    return JsonResponse({'success': False, 'error': 'Метод не разрешён.'}, status=405)
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def add_category_view(request):
+    if request.method == 'POST':
+        name = request.POST.get('name', '').strip()
+        if not name:
+            return JsonResponse({'success': False, 'error': 'Название категории обязательно.'}, status=400)
+
+        try:
+            category = Category.objects.create(name=name)
+            return JsonResponse({
+                'success': True,
+                'category': {'id': category.id, 'name': category.name}
+            })
+        except IntegrityError:
+            return JsonResponse({'success': False, 'error': 'Категория с таким названием уже существует.'}, status=400)
+        except ValidationError as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+
+    return JsonResponse({'success': False, 'error': 'Только POST-запросы разрешены.'}, status=405)
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def delete_category_view(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')
+
+        if not category_id:
+            return JsonResponse({'success': False, 'error': 'ID категории не передан.'}, status=400)
+
+        try:
+            category = get_object_or_404(Category, id=category_id)
+            if category.dish_set.exists():
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Невозможно удалить категорию, так как с ней связаны блюда.'
+                }, status=400)
+
+            category.delete()
+            return JsonResponse({'success': True})
+
+        except Category.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Категория не найдена.'}, status=404)
+        except ProtectedError:
+            return JsonResponse({
+                'success': False,
+                'error': 'Невозможно удалить категорию, так как с ней связаны другие данные.'
+            }, status=400)
+        except Exception as e:
+            print(f"Ошибка при удалении категории {category_id}: {e}")
+            return JsonResponse({'success': False, 'error': 'Внутренняя ошибка сервера.'}, status=500)
+
+    return JsonResponse({'success': False, 'error': 'Только POST-запросы разрешены.'}, status=405)

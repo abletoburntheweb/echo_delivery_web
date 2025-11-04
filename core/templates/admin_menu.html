@@ -57,7 +57,7 @@
                 <button class="close" onclick="closeAddDishModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="addDishForm">
+                <form id="addDishForm" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group">
                         <label for="newDishName">Имя блюда:</label>
@@ -75,12 +75,11 @@
                         <label for="newDishCategory">Категория:</label>
                         <select id="newDishCategory" name="category_id" required>
                             <option value="">Выберите категорию</option>
-                            <!-- Категории будут добавлены через JavaScript -->
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="newDishImage">Изображение (URL):</label>
-                        <input type="url" id="newDishImage" name="image" required>
+                        <label for="newDishImage">Изображение:</label>
+                        <input type="file" id="newDishImage" name="image" accept="image/*" required>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="save-button">Добавить</button>
@@ -113,44 +112,96 @@
         function addCategory() {
             const newCategoryName = prompt("Введите название новой категории:");
             if (newCategoryName && newCategoryName.trim() !== "") {
-                console.log("Попытка добавить категорию:", newCategoryName);
-                const categoryList = document.getElementById("category-list");
-                const li = document.createElement("li");
-                li.innerHTML = `<span>${newCategoryName}</span>`;
-                li.dataset.categoryId = "new_" + newCategoryName;
-                li.addEventListener('click', function() {
-                    selectCategory(this.dataset.categoryId, this.querySelector('span').textContent);
+                // Отправляем на сервер
+                fetch("{% url 'add_category' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams({
+                        'name': newCategoryName.trim()
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Добавляем в DOM
+                        const categoryList = document.getElementById("category-list");
+                        const li = document.createElement("li");
+                        li.innerHTML = `<span>${data.category.name}</span>`;
+                        li.dataset.categoryId = data.category.id;
+                        li.addEventListener('click', function() {
+                            selectCategory(this.dataset.categoryId, this.querySelector('span').textContent);
+                        });
+                        categoryList.appendChild(li);
+                        updateCategoryOptions();
+                        selectCategory(data.category.id, data.category.name);
+                    } else {
+                        alert("Ошибка: " + data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error("Ошибка при добавлении категории:", err);
+                    alert("Не удалось добавить категорию. Проверьте консоль.");
                 });
-                categoryList.appendChild(li);
-                // Обновим список в форме добавления блюда
-                updateCategoryOptions();
-                // Выберем новую категорию
-                selectCategory(li.dataset.categoryId, newCategoryName);
             }
         }
 
         function removeCategory() {
-            const categoryList = document.getElementById("category-list");
-            const selectedLi = Array.from(categoryList.children).find(li => li.classList.contains('selected'));
-            if (!selectedLi) {
-                alert("Пожалуйста, выберите категорию для удаления.");
-                return;
+    const categoryList = document.getElementById("category-list");
+    const selectedLi = Array.from(categoryList.children).find(li => li.classList.contains('selected'));
+
+    if (!selectedLi) {
+        alert("Пожалуйста, выберите категорию для удаления.");
+        return;
+    }
+
+    const categoryId = selectedLi.dataset.categoryId;
+
+    // Не удаляем "Все" и категории, которые могут быть в БД
+    if (categoryId === 'all') {
+        alert("Нельзя удалить категорию 'Все'.");
+        return;
+    }
+
+    if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
+        // Отправляем на сервер
+        fetch("{% url 'delete_category' %}", {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Accept': 'application/json'
+            },
+            body: new URLSearchParams({
+                'category_id': categoryId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Удаляем из DOM
+                selectedLi.remove();
+                // Обновим список в форме добавления блюда
+                updateCategoryOptions();
+                // Сбросим выбор
+                currentCategoryId = null;
+                // Обновим список блюд (покажем все, если "Все" выбрано, или очистим)
+                if (document.querySelector('#category-list li[data-category-id="all"]').classList.contains('selected')) {
+                    loadDishes(); // Покажем все блюда
+                } else {
+                    loadDishes(); // Покажем все блюда, так как выбранной больше нет
+                }
+            } else {
+                alert("Ошибка: " + data.error);
             }
-            console.log("Попытка удалить категорию с ID:", selectedLi.dataset.categoryId);
-            if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
-                 selectedLi.remove();
-                 // Обновим список в форме добавления блюда
-                 updateCategoryOptions();
-                 // Сбросим выбор
-                 currentCategoryId = null;
-                 // Обновим список блюд (покажем все, если "Все" выбрано, или очистим)
-                 if (document.querySelector('#category-list li[data-category-id="all"]').classList.contains('selected')) {
-                     loadDishes(); // Покажем все блюда
-                 } else {
-                     loadDishes(); // Покажем все блюда, так как выбранной больше нет
-                 }
-            }
-        }
+        })
+        .catch(err => {
+            console.error("Ошибка при удалении категории:", err);
+            alert("Не удалось удалить категорию. Проверьте консоль.");
+        });
+    }
+}
 
         // --- Функции для выбора категории и загрузки блюд ---
         function selectCategory(categoryId, categoryName) {
@@ -196,6 +247,7 @@
                     card.className = 'dish-card';
 
                     const img = document.createElement('img');
+                    // Используем .url для правильного пути к изображению
                     img.src = dish.image;
                     img.alt = dish.name;
                     img.className = 'dish-image';
@@ -255,36 +307,29 @@
 
             const formData = new FormData(this);
 
-            // Здесь нужно отправить запрос на сервер для добавления блюда.
-            // Пока что логируем данные и закрываем модальное окно.
-            console.log("Отправка данных для нового блюда:", Object.fromEntries(formData.entries()));
-
-            // В реальном приложении:
-            // fetch('{% url "add_dish" %}', { // Убедитесь, что у вас есть такой URL
-            //     method: 'POST',
-            //     body: formData
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     if (data.success) {
-            //         closeAddDishModal();
-            //         // Обновить список блюд на странице или перезагрузить
-            //         location.reload(); // Простой способ обновить после добавления
-            //     } else {
-            //         // Обработать ошибки
-            //         alert('Ошибка при добавлении блюда: ' + data.error);
-            //     }
-            // })
-            // .catch(error => {
-            //     console.error('Ошибка:', error);
-            //     alert('Произошла ошибка при подключении к серверу.');
-            // });
-
-            // Пока что просто закрываем модальное окно
-            closeAddDishModal();
-            // Имитируем добавление и обновление (временно)
-            alert("Блюдо добавлено (в реальности нужно отправить на сервер).");
-            location.reload(); // Перезагружаем для обновления данных
+            // Отправляем на сервер
+            fetch('{% url "add_dish" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeAddDishModal();
+                    // Обновить список блюд на странице или перезагрузить
+                    location.reload(); // Простой способ обновить после добавления
+                } else {
+                    // Обработать ошибки
+                    alert('Ошибка при добавлении блюда: ' + (data.errors ? data.errors.join(", ") : data.error));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при подключении к серверу.');
+            });
         });
 
         // --- Инициализация ---
@@ -295,7 +340,8 @@
                     id: {{ dish.id }},
                     name: "{{ dish.name|escapejs }}",
                     price: {{ dish.price }},
-                    image: "{{ dish.image|escapejs }}",
+                    // Теперь используем .url для изображения
+                    image: "{{ dish.image.url|escapejs }}",
                     categoryId: {{ dish.category.id }}
                 },
             {% endfor %}
