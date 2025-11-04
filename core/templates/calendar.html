@@ -39,7 +39,7 @@
             <form id="calendar-form" method="post">
                 {% csrf_token %}
                 <input type="hidden" id="selected-date" name="selected_date" value="">
-                <button class="accept-button" type="submit" onclick="window.location.href='{% url 'cart' %}'; return false;">Принять</button>
+                <button class="accept-button" type="submit">Принять</button>
             </form>
         </div>
     </div>

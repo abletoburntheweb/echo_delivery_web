@@ -6,6 +6,16 @@
     <title>Авторизация | ECHO Corp.</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}">
+    <style>
+        /* Добавим базовый стиль для сообщения об ошибке */
+        .error-message {
+            color: red;
+            font-size: 0.9em;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+    </style>
 </head>
 <body>
     <div class="header">ECHO Corp.</div>
@@ -18,6 +28,9 @@
                 <input type="password" name="password" placeholder="Пароль" required><br>
                 <button type="submit">Войти</button>
             </form>
+            {% if error_message %}
+                <div class="error-message">{{ error_message }}</div>
+            {% endif %}
             <a href="{% url 'register' %}" class="register-link">Регистрация</a>
         </div>
     </div>
