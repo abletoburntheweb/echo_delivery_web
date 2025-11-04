@@ -17,10 +17,14 @@
             <h2>Данные профиля</h2>
             <form method="post">
                 {% csrf_token %}
-                <input type="text" value="Название фирмы" readonly><br>
-                <input type="text" value="Телефон" readonly><br>
-                <input type="email" value="Почта" readonly><br>
-                <input type="password" value="Пароль" readonly><br>
+                <!-- Логин (username) -->
+                <input type="text" value="{{ user.username }}" readonly><br>
+                <!-- Почта (email) -->
+                <input type="email" value="{{ user.email }}" readonly><br>
+                <!-- Телефон - пока пусто, так как не храним -->
+                <input type="text" value="" readonly><br>
+                <!-- Пароль - показываем как ******** -->
+                <input type="password" value="********" readonly><br>
                 <div class="footer-links">
                     <a href="{% url 'agreement' %}" class="agreement-link">Договор/соглашение</a>
                     <button type="submit" class="logout-button">Выйти</button>

@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
+from .models import Dish, Category # Импортируем модели
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -58,7 +59,8 @@ def calendar_view(request):
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
                 print(f"Дата выбрана: {selected_date}")
                 request.session['selected_date'] = selected_date_str
-                return redirect('cart')
+                # <-- ВАЖНО: Редирект в cart_view
+                return redirect('cart')  # <-- cart_view сам определит, какой шаблон использовать (cart или admin_cart)
             except ValueError:
                 print("Неверный формат даты")
                 pass
@@ -99,6 +101,9 @@ def admin_calendar_view(request):
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
                 print(f"Дата выбрана (админ): {selected_date}")
                 request.session['selected_date'] = selected_date_str
+                # --- Добавляем редирект ---
+                return redirect('cart') # или redirect('admin_cart')
+                # ------------------------
             except ValueError:
                 print("Неверный формат даты")
                 pass
@@ -188,86 +193,6 @@ def menu_view(request):
             'id': 2,
             'name': 'Блюдо 2',
             'price': 320,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+2'
-        },
-        {
-            'id': 3,
-            'name': 'Блюдо 3',
-            'price': 180,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+3'
-        },
-        {
-            'id': 4,
-            'name': 'Блюдо 4',
-            'price': 450,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+4'
-        },
-        {
-            'id': 5,
-            'name': 'Блюдо 5',
-            'price': 290,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+5'
-        },
-        {
-            'id': 6,
-            'name': 'Блюдо 6',
-            'price': 380,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+6'
-        },
-        {
-            'id': 7,
-            'name': 'Блюдо 7',
-            'price': 250,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+7'
-        },
-        {
-            'id': 8,
-            'name': 'Блюдо 8',
-            'price': 320,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+8'
-        },
-        {
-            'id': 9,
-            'name': 'Блюдо 9',
-            'price': 180,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+9'
-        },
-        {
-            'id': 10,
-            'name': 'Блюдо 10',
-            'price': 450,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+10'
-        },
-        {
-            'id': 11,
-            'name': 'Блюдо 11',
-            'price': 290,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+11'
-        },
-        {
-            'id': 12,
-            'name': 'Блюдо 12',
-            'price': 380,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+12'
-        },
-    ]
-
-    return render(request, 'menu.html', {'dishes': dishes})
-
-@user_passes_test(lambda u: u.is_superuser)
-@login_required
-def admin_menu_view(request):
-    dishes = [
-        {
-            'id': 1,
-            'name': 'Блюдо 1',
-            'price': 250,
-            'image': '  https://via.placeholder.com/300x200?text=Блюдо+1'
-        },
-        {
-            'id': 2,
-            'name': 'Блюдо 2',
-            'price': 320,
             'image': '    https://via.placeholder.com/300x200?text=Блюдо+2'
         },
         {
@@ -331,7 +256,16 @@ def admin_menu_view(request):
             'image': '    https://via.placeholder.com/300x200?text=Блюдо+12'
         },
     ]
-    return render(request, 'admin_menu.html', {'dishes': dishes})
+
+    return render(request, 'menu.html', {'dishes': dishes})
+
+@user_passes_test(lambda u: u.is_superuser)
+@login_required
+def admin_menu_view(request):
+    categories = Category.objects.all()
+    dishes = Dish.objects.select_related('category').all()
+
+    return render(request, 'admin_menu.html', {'dishes': dishes, 'categories': categories})
 
 def _get_dish_by_id(dish_id):
     dishes = [
@@ -339,42 +273,42 @@ def _get_dish_by_id(dish_id):
             'id': 1,
             'name': 'Плов',
             'price': 250,
-            'image': '  https://via.placeholder.com/300x200?text=Плов',
+            'image': '    https://via.placeholder.com/300x200?text=Плов',
             'description': 'Состоит из нескольких компонентов, объединённых в единую порцию. Каждый элемент располагается в определённой и взаимодействует с другими в пределах обной структуры.'
         },
         {
             'id': 2,
             'name': 'Борщ',
             'price': 320,
-            'image': '    https://via.placeholder.com/300x200?text=Борщ',
+            'image': '      https://via.placeholder.com/300x200?text=Борщ',
             'description': 'Традиционный славянский суп из свеклы, капусты, мяса и специй. Готовится долго, но результат того стоит.'
         },
         {
             'id': 3,
             'name': 'Салат Цезарь',
             'price': 180,
-            'image': '    https://via.placeholder.com/300x200?text=Цезарь',
+            'image': '      https://via.placeholder.com/300x200?text=Цезарь',
             'description': 'Классический салат с курицей, сухариками, пармезаном и соусом Цезарь. Идеально подходит для легкого перекуса.'
         },
         {
             'id': 4,
             'name': 'Пицца Маргарита',
             'price': 450,
-            'image': '    https://via.placeholder.com/300x200?text=Пицца',
+            'image': '      https://via.placeholder.com/300x200?text=Пицца',
             'description': 'Итальянская пицца с томатным соусом, моцареллой и базиликом. Простота и вкус в одном блюде.'
         },
         {
             'id': 5,
             'name': 'Оливье',
             'price': 290,
-            'image': '    https://via.placeholder.com/300x200?text=Оливье',
+            'image': '      https://via.placeholder.com/300x200?text=Оливье',
             'description': 'Новогодний салат из картофеля, моркови, огурцов, яиц и колбасы. Всегда радует своим вкусом.'
         },
         {
             'id': 6,
             'name': 'Суп-пюре из тыквы',
             'price': 380,
-            'image': '    https://via.placeholder.com/300x200?text=Тыква',
+            'image': '      https://via.placeholder.com/300x200?text=Тыква',
             'description': 'Кремовый суп из спелой тыквы с сливками и специями. Тепло и уютно в холодный день.'
         },
     ]
@@ -497,7 +431,7 @@ def profile_view(request):
     else:
         template_name = 'profile.html'
 
-    return render(request, template_name)
+    return render(request, template_name, {'user': request.user})
 
 @login_required
 def agreement_view(request):

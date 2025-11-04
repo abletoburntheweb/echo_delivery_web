@@ -1,12 +1,23 @@
 # core/models.py
 from django.db import models
-from django.contrib.auth.models import User  # Используем встроенную модель пользователя
+from django.contrib.auth.models import User
+
+class Category(models.Model):
+    name = models.CharField(max_length=200, verbose_name="Название категории", unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
 class Dish(models.Model):
     name = models.CharField(max_length=200, verbose_name="Название")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    image = models.URLField(verbose_name="Изображение")  # Или models.ImageField() если файлы хранятся локально
+    image = models.URLField(verbose_name="Изображение")
     description = models.TextField(verbose_name="Описание", blank=True, null=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name="Категория", null=True, blank=True)
 
     def __str__(self):
         return self.name

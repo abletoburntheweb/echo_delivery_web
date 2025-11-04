@@ -1,4 +1,4 @@
-<!-- templates/admin_menu.html -->
+<!-- templates/core/admin_menu.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,6 +6,7 @@
     <title>Админ Меню | ECHO Corp.</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_menu.css' %}">
+    <!-- Стили для модального окна теперь в admin_menu.css -->
 </head>
 <body>
     <div class="header">
@@ -16,7 +17,8 @@
         </div>
     </div>
     <div class="full-screen-menu">
-        <button class="add-dish-btn">Добавить</button>
+        <!-- Кнопка "Добавить" -->
+        <button class="add-dish-btn" onclick="openModal()">Добавить</button>
 
         <div class="search-bar">
             <input type="text" id="search-input" placeholder="Поиск...">
@@ -37,5 +39,56 @@
             {% endfor %}
         </div>
     </div>
+
+    <!-- Подключаем модальное окно -->
+    {% include 'core/partials/modal_category.html' %}
+
+    <script>
+        // Функции для открытия/закрытия модального окна
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        // Закрытие модального окна при клике вне его содержимого
+        window.onclick = function(event) {
+            const modal = document.getElementById("myModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Функция для добавления категории (пока виртуально)
+        function addCategory() {
+            const newCategoryName = prompt("Введите название новой категории:");
+            if (newCategoryName && newCategoryName.trim() !== "") {
+                console.log("Попытка добавить категорию:", newCategoryName);
+                const select = document.getElementById("categorySelect");
+                const option = document.createElement("option");
+                option.value = "new_" + newCategoryName; // Виртуальное значение
+                option.text = newCategoryName;
+                select.add(option);
+                select.value = option.value; // Выберем новую категорию
+            }
+        }
+
+        // Функция для удаления категории (пока виртуально)
+        function removeCategory() {
+            const select = document.getElementById("categorySelect");
+            const selectedValue = select.value;
+            if (selectedValue === "") {
+                alert("Пожалуйста, выберите категорию для удаления.");
+                return;
+            }
+            console.log("Попытка удалить категорию с ID:", selectedValue);
+            if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
+                 select.remove(select.selectedIndex); // Удаляет выбранный элемент
+                 select.value = ""; // Сбрасывает выбор
+            }
+        }
+    </script>
 </body>
 </html>

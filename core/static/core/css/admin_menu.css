@@ -1,6 +1,5 @@
 /* static/core/css/admin_menu.css */
 
-
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
@@ -11,7 +10,6 @@ body {
     min-height: 100vh;
     box-sizing: border-box;
 }
-
 
 .header {
     width: 100%;
@@ -69,7 +67,6 @@ body {
     background-color: #1d2c3a;
 }
 
-
 .full-screen-menu {
     flex-grow: 1;
     padding: 20px;
@@ -79,7 +76,6 @@ body {
     overflow-y: auto;
     box-sizing: border-box;
 }
-
 
 .add-dish-btn {
     width: 250px;
@@ -103,7 +99,6 @@ body {
 .add-dish-btn:hover {
     background-color: #1d2c3a;
 }
-
 
 .search-bar {
     display: flex;
@@ -138,7 +133,6 @@ body {
     color: #1d2c3a;
 }
 
-
 .menu-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -152,7 +146,6 @@ body {
     overflow-y: auto;
     max-height: calc(100vh - 250px);
 }
-
 
 .dish-card {
     background-color: white;
@@ -200,3 +193,136 @@ body {
     display: block;
     width: 100%;
 }
+
+/* --- Стили для модального окна --- */
+.modal {
+    display: none; /* Скрыто по умолчанию */
+    position: fixed; /* Фиксированное позиционирование */
+    z-index: 1000; /* Высокий z-index, чтобы поверх всего */
+    left: 0;
+    top: 0;
+    width: 100%; /* Занимает всю ширину экрана */
+    height: 100%; /* Занимает всю высоту экрана */
+    background-color: rgba(0,0,0,0.4); /* Затемнённый фон */
+    /* --- Добавляем эти строки для центрирования --- */
+    display: flex; /* Делаем модальное окно flex-контейнером */
+    align-items: center; /* Центрируем по вертикали */
+    justify-content: center; /* Центрируем по горизонтали */
+    padding: 20px; /* Отступы, чтобы окно не прижималось к краям экрана */
+    box-sizing: border-box; /* Включаем padding в расчёт ширины/высоты */
+    /* ------------------------------------------ */
+}
+
+/* Убираем старые стили центрирования и сбрасываем margin */
+.modal-content {
+    background-color: #fefefe;
+    /* margin: 15% auto;  <-- ПОЛНОСТЬЮ УБЕРИ ЭТУ СТРОКУ */
+    margin: 0 !important; /* Явно сбрасываем margin */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    position: relative; /* Позиционирование относительно .modal */
+    /* Убедимся, что flex не мешает */
+    align-self: center; /* Центрируем сам элемент внутри flex-контейнера .modal */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.close {
+    color: #aaa;
+    float: none; /* Убираем float */
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+}
+
+.category-controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.category-controls select {
+    flex-grow: 1;
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    background: white;
+}
+
+.category-controls button {
+    margin-left: 5px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+}
+
+.category-controls button:first-child {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.category-controls button:first-child:hover {
+    background-color: #1d2c3a;
+}
+
+.category-controls button:last-child {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.category-controls button:last-child:hover {
+    background-color: #c0392b;
+}
+
+.modal-footer {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.modal-footer button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+    background-color: #2c3e50;
+    color: white;
+}
+
+.modal-footer button:hover {
+    background-color: #1d2c3a;
+}
+/* --- Конец стилей для модального окна --- */
