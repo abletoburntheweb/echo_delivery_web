@@ -413,3 +413,39 @@ body {
 .modal-footer button:hover {
     background-color: #1d2c3a;
 }
+/* --- Стили для нового модального окна добавления блюда --- */
+#addDishModal .modal-content {
+    /* Унаследует стили от .modal-content, можно уточнить при необходимости */
+    width: 60%; /* Ширина чуть больше */
+    max-width: 600px; /* Максимальная ширина */
+}
+
+#addDishModal .form-group {
+    margin-bottom: 15px;
+}
+
+#addDishModal label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+#addDishModal input[type="text"],
+#addDishModal input[type="number"],
+#addDishModal input[type="url"],
+#addDishModal textarea,
+#addDishModal select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+#addDishModal textarea {
+    resize: vertical; /* Позволяет изменять высоту */
+    min-height: 80px;
+}
+/* --- Конец стилей для нового модального окна --- */

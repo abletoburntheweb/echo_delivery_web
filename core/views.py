@@ -1,10 +1,10 @@
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.shortcuts import render, redirect, get_object_or_404 # Импортируем get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404 
 from django.contrib.auth import authenticate, login, logout
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category # Импортируем модели
+from .models import Dish, Category 
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -59,8 +59,8 @@ def calendar_view(request):
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
                 print(f"Дата выбрана: {selected_date}")
                 request.session['selected_date'] = selected_date_str
-                # <-- ВАЖНО: Редирект в cart_view
-                return redirect('cart')  # <-- cart_view сам определит, какой шаблон использовать (cart или admin_cart)
+                
+                return redirect('cart')  
             except ValueError:
                 print("Неверный формат даты")
                 pass
@@ -101,9 +101,9 @@ def admin_calendar_view(request):
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
                 print(f"Дата выбрана (админ): {selected_date}")
                 request.session['selected_date'] = selected_date_str
-                # --- Добавляем редирект ---
-                return redirect('cart') # или redirect('admin_cart')
-                # ------------------------
+                
+                return redirect('cart') 
+                
             except ValueError:
                 print("Неверный формат даты")
                 pass
@@ -182,47 +182,47 @@ def update_cart(request):
 
 @login_required
 def menu_view(request):
-    # Убираем "виртуальный" список
-    # dishes = [ ... ]
-    # Получаем блюда из базы данных
+    
+    
+    
     dishes = Dish.objects.select_related('category').all()
     return render(request, 'menu.html', {'dishes': dishes})
 
-# Убираем функцию _get_dish_by_id
-# def _get_dish_by_id(dish_id):
-#     # ...
-#     return ...
+
+
+
+
 
 @login_required
 def dish_detail_view(request, dish_id):
     print(f"Запрошенное dish_id: {dish_id}")
-    # Убираем вызов _get_dish_by_id
-    # dish = _get_dish_by_id(dish_id)
+    
+    
 
-    # Получаем блюдо из базы данных
-    dish = get_object_or_404(Dish, id=dish_id) # Используем get_object_or_404 для краткости
+    
+    dish = get_object_or_404(Dish, id=dish_id) 
     print(f"Найдено блюдо из базы: {dish}")
-    # Передаём объект dish в шаблон
+    
     return render(request, 'dish_detail.html', {'dish': dish})
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dish_detail_view(request, dish_id):
     print(f"admin_dish_detail_view вызвана для dish_id: {dish_id}")
-    # Убираем вызов _get_dish_by_id
-    # dish = _get_dish_by_id(dish_id)
+    
+    
 
-    # Получаем блюдо из базы данных
-    dish = get_object_or_404(Dish, id=dish_id) # Используем get_object_or_404 для краткости
-    # previous_url = request.META.get('HTTP_REFERER', '')
+    
+    dish = get_object_or_404(Dish, id=dish_id) 
+    
 
-    # if not previous_url or not previous_url.startswith('/admin/'):
-    #     previous_url = reverse('admin_menu')
+    
+    
 
-    # print(f"Рендерим admin_dish_detail.html. Предыдущая страница: {previous_url}")
+    
 
     return render(request, 'admin_dish_detail.html', {
         'dish': dish,
-        # 'previous_url': previous_url # Убрано, если не нужно
+        
     })
 
 @login_required
@@ -233,17 +233,17 @@ def add_to_cart(request):
             return redirect('calendar')
 
         dish_id = request.POST.get('dish_id')
-        # dish_name = request.POST.get('dish_name') # Убираем, получаем из базы
-        # dish_price = request.POST.get('dish_price') # Убираем, получаем из базы
-        # dish_image = request.POST.get('dish_image') # Убираем, получаем из базы
+        
+        
+        
         quantity = int(request.POST.get('quantity', 1))
 
-        # Получаем блюдо из базы, чтобы получить его данные
+        
         try:
             dish_obj = Dish.objects.get(id=dish_id)
         except Dish.DoesNotExist:
             print(f"Блюдо с ID {dish_id} не найдено в базе данных при добавлении в корзину")
-            return redirect('menu') # Или возвращаем ошибку
+            return redirect('menu') 
 
         all_carts = request.session.get('carts', {})
         cart = all_carts.get(selected_date_str, [])
@@ -256,7 +256,7 @@ def add_to_cart(request):
                 break
 
         if not found:
-            # Используем данные из объекта модели Dish
+            
             cart.append({
                 'id': dish_obj.id,
                 'name': dish_obj.name,
@@ -329,23 +329,23 @@ def agreement_view(request):
 def admin_menu_view(request):
     categories = Category.objects.all()
     dishes = Dish.objects.select_related('category').all()
-    # Передаём и категории, и блюда в шаблон
+    
     return render(request, 'admin_menu.html', {'dishes': dishes, 'categories': categories})
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser) # Только администратор может редактировать
-def update_dish(request, dish_id): # Принимаем dish_id из URL
+@user_passes_test(lambda u: u.is_superuser) 
+def update_dish(request, dish_id): 
     if request.method == 'POST':
         try:
-            # Найти блюдо по ID
+            
             dish = get_object_or_404(Dish, id=dish_id)
 
-            # Получить новые данные из POST-запроса
+            
             new_name = request.POST.get('name')
             new_description = request.POST.get('description')
             new_price_str = request.POST.get('price')
 
-            # Валидация (простая)
+            
             errors = []
             if not new_name or new_name.strip() == '':
                 errors.append("Имя не может быть пустым.")
@@ -360,25 +360,95 @@ def update_dish(request, dish_id): # Принимаем dish_id из URL
                     errors.append("Цена должна быть числом.")
 
             if errors:
-                # Вернуть ошибки как ответ (можно сделать красивее)
+                
                 return HttpResponse("; ".join(errors), status=400)
 
-            # Обновить поля блюда
+            
             dish.name = new_name.strip()
-            dish.description = new_description # может быть пустым
+            dish.description = new_description 
             dish.price = new_price
 
-            # Сохранить изменения в базу данных
+            
             dish.save()
 
-            # Вернуть успешный ответ
+            
             return HttpResponse("OK", status=200)
 
         except Exception as e:
-            # Обработать возможные ошибки при сохранении
+            
             print(f"Ошибка при обновлении блюда {dish_id}: {e}")
             return HttpResponse("Ошибка сервера при сохранении.", status=500)
 
     else:
-        # Если не POST, вернуть 405 Method Not Allowed
+        
         return HttpResponse("Метод не разрешён.", status=405)
+@login_required
+@user_passes_test(lambda u: u.is_superuser) 
+def add_dish_view(request):
+    if request.method == 'POST':
+        try:
+            
+            name = request.POST.get('name')
+            description = request.POST.get('description', '') 
+            price_str = request.POST.get('price')
+            category_id = request.POST.get('category_id')
+            image_url = request.POST.get('image')
+
+            
+            errors = []
+            if not name or name.strip() == "":
+                errors.append("Поле 'Имя' обязательно.")
+            if not price_str:
+                errors.append("Поле 'Цена' обязательно.")
+            if not category_id:
+                errors.append("Поле 'Категория' обязательно.")
+            if not image_url:
+                errors.append("Поле 'Изображение' обязательно.")
+
+            if errors:
+                return JsonResponse({'success': False, 'errors': errors}, status=400) 
+
+            
+            try:
+                price = float(price_str)
+                if price < 0:
+                    errors.append("Цена не может быть отрицательной.")
+            except ValueError:
+                errors.append("Поле 'Цена' должно быть числом.")
+
+            if errors:
+                return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+            
+            try:
+                category = Category.objects.get(id=category_id)
+            except Category.DoesNotExist:
+                errors.append("Выбранная категория не существует.")
+                return JsonResponse({'success': False, 'errors': errors}, status=400)
+
+            
+            new_dish = Dish.objects.create(
+                name=name.strip(), 
+                description=description.strip(),
+                price=price,
+                category=category, 
+                image=image_url.strip() 
+            )
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Блюдо успешно добавлено!',
+                'dish': {
+                    'id': new_dish.id,
+                    'name': new_dish.name,
+                    'price': str(new_dish.price),
+                    'image': new_dish.image,
+                    'category_id': new_dish.category.id
+                }
+            }, status=201)
+        except Exception as e:
+            print(f"Ошибка при добавлении блюда: {e}") 
+            return JsonResponse({'success': False, 'error': 'Внутренняя ошибка сервера.'}, status=500)
+
+    else:
+        return JsonResponse({'success': False, 'error': 'Метод не разрешён.'}, status=405)
