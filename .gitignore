@@ -23,11 +23,13 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-.env
+
 # Virtual environments
 venv/
 env/
 ENV/
+# Игнорируем конкретное твоё виртуальное окружение
+echodel/ 
 
 # IDEs
 .idea/
@@ -43,5 +45,5 @@ Thumbs.db
 *.log
 local_settings.py
 db.sqlite3
-media/
-staticfiles/
+media/     
+staticfiles/ # Папка, куда collectstatic собирает статику (если не планируешь коммитить результат)
