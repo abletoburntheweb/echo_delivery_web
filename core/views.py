@@ -1,4 +1,4 @@
-from PIL.Image import Image
+from PIL import Image
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import ProtectedError
 from django.shortcuts import render, redirect, get_object_or_404 
@@ -346,7 +346,7 @@ def update_dish(request, dish_id):
             new_name = request.POST.get('name', '').strip()
             new_description = request.POST.get('description', '').strip()
             new_price_str = request.POST.get('price')
-            new_image_file = request.FILES.get('image') 
+            new_image_file = request.FILES.get('image')
 
             errors = []
             if not new_name:
@@ -426,11 +426,15 @@ def add_dish_view(request):
                     errors.append("Выбранная категория не существует.")
 
             if image_file and not errors:
+                print(f"Загруженный файл: {image_file.name}, размер: {image_file.size} байт, тип: {image_file.content_type}")
                 try:
                     img = Image.open(image_file)
+                    print(f"Формат изображения: {img.format}")
                     img.verify()
+                    print("Файл прошёл проверку verify().")
                     image_file.seek(0)
-                except Exception:
+                except Exception as e:
+                    print(f"Ошибка проверки изображения: {e}")
                     errors.append("Загруженный файл не является изображением.")
 
             if errors:

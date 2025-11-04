@@ -20,7 +20,6 @@ urlpatterns = [
     path('agreement/', views.agreement_view, name='agreement'),
 
     path('admin/menu/', views.admin_menu_view, name='admin_menu'),
-    path('admin/dish/add/', views.add_dish_view, name='add_dish'),
     path('admin/category/add/', views.add_category_view, name='add_category'),
     path('admin/dish/<int:dish_id>/', views.admin_dish_detail_view, name='admin_dish_detail'),
 ]

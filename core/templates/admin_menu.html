@@ -16,7 +16,6 @@
         </div>
     </div>
     <div class="full-screen-menu">
-        <!-- Кнопка "Добавить" -->
         <button class="add-dish-btn" onclick="openAddDishModal()">Добавить блюдо</button>
 
         <div class="search-bar">
@@ -25,11 +24,9 @@
         </div>
 
         <div class="main-content">
-            <!-- Сайдбар слева -->
             <div class="sidebar">
                 <h3>Категории</h3>
                 <ul id="category-list">
-                    <!-- "Все" будет добавлена через JavaScript -->
                 </ul>
                 <div class="category-controls">
                     <button class="add-category-btn" onclick="addCategory()">+</button>
@@ -37,19 +34,14 @@
                 </div>
             </div>
 
-            <!-- Основное содержимое справа -->
             <div class="content-area">
                 <div class="menu-grid" id="dish-grid">
-                    <!-- Блюда будут добавлены через JavaScript -->
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Подключаем модальное окно для категорий -->
-    {% include 'core/partials/modal_category.html' %}
 
-    <!-- Новое модальное окно для добавления блюда -->
     <div id="addDishModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -90,29 +82,11 @@
     </div>
 
     <script>
-        // Глобальная переменная для хранения текущей выбранной категории
         let currentCategoryId = null;
-
-        // --- Функции для модального окна категорий (как было) ---
-        function openModal() {
-            document.getElementById("myModal").style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById("myModal").style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById("myModal");
-            if (event.target === modal) {
-                closeModal();
-            }
-        }
 
         function addCategory() {
             const newCategoryName = prompt("Введите название новой категории:");
             if (newCategoryName && newCategoryName.trim() !== "") {
-                // Отправляем на сервер
                 fetch("{% url 'add_category' %}", {
                     method: 'POST',
                     headers: {
@@ -126,7 +100,6 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // Добавляем в DOM
                         const categoryList = document.getElementById("category-list");
                         const li = document.createElement("li");
                         li.innerHTML = `<span>${data.category.name}</span>`;
@@ -159,14 +132,12 @@
 
     const categoryId = selectedLi.dataset.categoryId;
 
-    // Не удаляем "Все" и категории, которые могут быть в БД
     if (categoryId === 'all') {
         alert("Нельзя удалить категорию 'Все'.");
         return;
     }
 
     if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
-        // Отправляем на сервер
         fetch("{% url 'delete_category' %}", {
             method: 'POST',
             headers: {
@@ -180,17 +151,13 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Удаляем из DOM
                 selectedLi.remove();
-                // Обновим список в форме добавления блюда
                 updateCategoryOptions();
-                // Сбросим выбор
                 currentCategoryId = null;
-                // Обновим список блюд (покажем все, если "Все" выбрано, или очистим)
                 if (document.querySelector('#category-list li[data-category-id="all"]').classList.contains('selected')) {
-                    loadDishes(); // Покажем все блюда
+                    loadDishes();
                 } else {
-                    loadDishes(); // Покажем все блюда, так как выбранной больше нет
+                    loadDishes();
                 }
             } else {
                 alert("Ошибка: " + data.error);
@@ -203,7 +170,6 @@
     }
 }
 
-        // --- Функции для выбора категории и загрузки блюд ---
         function selectCategory(categoryId, categoryName) {
             const categoryItems = document.querySelectorAll("#category-list li");
             categoryItems.forEach(item => item.classList.remove('selected'));
@@ -226,7 +192,6 @@
                 const filteredDishes = allDishes.filter(dish => dish.categoryId == categoryId);
                 renderDishes(filteredDishes);
             } else {
-                // Показываем все блюда для "Все" или если categoryId null
                 dishGrid.innerHTML = '<p>Загрузка всех блюд...</p>';
                 renderDishes(allDishes);
             }
@@ -247,7 +212,6 @@
                     card.className = 'dish-card';
 
                     const img = document.createElement('img');
-                    // Используем .url для правильного пути к изображению
                     img.src = dish.image;
                     img.alt = dish.name;
                     img.className = 'dish-image';
@@ -275,11 +239,9 @@
             }
         }
 
-        // --- Функции для нового модального окна добавления блюда ---
         function openAddDishModal() {
             const modal = document.getElementById("addDishModal");
             modal.style.display = "flex";
-            // Сбросим форму при открытии
             document.getElementById('addDishForm').reset();
         }
 
@@ -288,26 +250,22 @@
             modal.style.display = "none";
         }
 
-        // Закрытие модального окна добавления блюда при клике вне его содержимого
         window.onclick = function(event) {
             const modal = document.getElementById("addDishModal");
             if (event.target === modal) {
                 closeAddDishModal();
             }
-            // Вызов оригинальной функции для модального окна категорий
             const catModal = document.getElementById("myModal");
             if (event.target === catModal) {
                 closeModal();
             }
         }
 
-        // Обработчик отправки формы добавления блюда
         document.getElementById('addDishForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
             const formData = new FormData(this);
 
-            // Отправляем на сервер
             fetch('{% url "add_dish" %}', {
                 method: 'POST',
                 body: formData,
@@ -319,10 +277,8 @@
             .then(data => {
                 if (data.success) {
                     closeAddDishModal();
-                    // Обновить список блюд на странице или перезагрузить
-                    location.reload(); // Простой способ обновить после добавления
+                    location.reload();
                 } else {
-                    // Обработать ошибки
                     alert('Ошибка при добавлении блюда: ' + (data.errors ? data.errors.join(", ") : data.error));
                 }
             })
@@ -332,25 +288,20 @@
             });
         });
 
-        // --- Инициализация ---
-        // Данные о блюдах (передаются из Django)
         const allDishes = [
             {% for dish in dishes %}
                 {
                     id: {{ dish.id }},
                     name: "{{ dish.name|escapejs }}",
                     price: {{ dish.price }},
-                    // Теперь используем .url для изображения
                     image: "{{ dish.image.url|escapejs }}",
                     categoryId: {{ dish.category.id }}
                 },
             {% endfor %}
         ];
 
-        // Функция для обновления опций в селекте категории в форме добавления блюда
         function updateCategoryOptions() {
             const selectElement = document.getElementById('newDishCategory');
-            // Очистим текущие опции (кроме первой "Выберите...")
             selectElement.innerHTML = '<option value="">Выберите категорию</option>';
 
             const categories = Array.from(document.querySelectorAll("#category-list li")).filter(li => li.dataset.categoryId !== 'all');
@@ -363,20 +314,17 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Загрузим категории из данных, переданных шаблоном + "Все"
             const categoryList = document.getElementById("category-list");
 
-            // Добавим категорию "Все"
             const allLi = document.createElement("li");
             allLi.innerHTML = `<span>Все</span>`;
             allLi.dataset.categoryId = "all";
-            allLi.dataset.categoryName = "Все"; // Добавим имя для удобства
+            allLi.dataset.categoryName = "Все";
             allLi.addEventListener('click', function() {
                 selectCategory(this.dataset.categoryId, this.dataset.categoryName);
             });
             categoryList.appendChild(allLi);
 
-            // Загрузим остальные категории
             const categories = [
                 {% for cat in categories %}
                     { id: {{ cat.id }}, name: "{{ cat.name|escapejs }}" },
@@ -394,10 +342,8 @@
                 categoryList.appendChild(li);
             });
 
-            // Обновим опции в селекте формы добавления блюда
             updateCategoryOptions();
 
-            // Загрузим все блюда по умолчанию (категория "Все" выбрана)
             selectCategory("all", "Все");
         });
     </script>
