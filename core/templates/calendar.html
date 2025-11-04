@@ -51,14 +51,11 @@
         let selectedButton = null;
 
         function selectDay(button) {
-            // Снимаем класс selected со всех кнопок
             dayButtons.forEach(btn => btn.classList.remove('selected'));
 
-            // Добавляем класс selected к выбранной кнопке
             button.classList.add('selected');
             selectedButton = button;
 
-            // Сохраняем выбранную дату в скрытое поле формы
             const dateValue = button.getAttribute('data-date');
             selectedDateInput.value = dateValue;
             console.log('Выбрана дата:', dateValue);
@@ -71,14 +68,12 @@
         });
 
         if (selectedDateInput.value) {
-            // Если есть, находим соответствующую кнопку и "выбираем" её
             const previouslySelectedButton = document.querySelector(`.day-btn[data-date="${selectedDateInput.value}"]`);
             if (previouslySelectedButton) {
                 selectDay(previouslySelectedButton);
             }
         } else {
-            // Если нет, выбираем сегодняшний день
-            const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+            const today = new Date().toISOString().split('T')[0];
             const todayButton = document.querySelector(`.day-btn[data-date="${today}"]`);
             if (todayButton) {
                 selectDay(todayButton);

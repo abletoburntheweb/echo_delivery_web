@@ -186,47 +186,26 @@ def update_cart(request):
 
 @login_required
 def menu_view(request):
-    
-    
-    
-    dishes = Dish.objects.select_related('category').all()
-    return render(request, 'menu.html', {'dishes': dishes})
-
-
-
-
-
+    if request.user.is_superuser:
+        return admin_menu_view(request)
+    else:
+        categories = Category.objects.all()
+        dishes = Dish.objects.select_related('category').all()
+        return render(request, 'menu.html', {'dishes': dishes, 'categories': categories})
 
 @login_required
 def dish_detail_view(request, dish_id):
     print(f"Запрошенное dish_id: {dish_id}")
-    
-    
-
-    
     dish = get_object_or_404(Dish, id=dish_id) 
     print(f"Найдено блюдо из базы: {dish}")
-    
     return render(request, 'dish_detail.html', {'dish': dish})
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dish_detail_view(request, dish_id):
     print(f"admin_dish_detail_view вызвана для dish_id: {dish_id}")
-    
-    
-
-    
-    dish = get_object_or_404(Dish, id=dish_id) 
-    
-
-    
-    
-
-    
-
+    dish = get_object_or_404(Dish, id=dish_id)
     return render(request, 'admin_dish_detail.html', {
         'dish': dish,
-        
     })
 
 @login_required
@@ -235,23 +214,15 @@ def add_to_cart(request):
         selected_date_str = request.session.get('selected_date')
         if not selected_date_str:
             return redirect('calendar')
-
         dish_id = request.POST.get('dish_id')
-        
-        
-        
         quantity = int(request.POST.get('quantity', 1))
-
-        
         try:
             dish_obj = Dish.objects.get(id=dish_id)
         except Dish.DoesNotExist:
             print(f"Блюдо с ID {dish_id} не найдено в базе данных при добавлении в корзину")
-            return redirect('menu') 
-
+            return redirect('menu')
         all_carts = request.session.get('carts', {})
         cart = all_carts.get(selected_date_str, [])
-
         found = False
         for item in cart:
             if item['id'] == dish_id:

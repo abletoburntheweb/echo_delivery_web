@@ -12,15 +12,19 @@
         <span class="header-title">ECHO Corp.</span>
         <a href="{% url 'profile' %}" class="profile-button">👤</a>
     </div>
+
     <div class="full-screen-menu">
         <a href="{% url 'menu' %}" class="back-button">Назад</a>
 
         <div class="dish-detail-card">
-            <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">
+            <div class="image-container">
+                <img src="{{ dish.image.url }}" alt="{{ dish.name }}" class="dish-image">
+            </div>
 
             <div class="dish-content">
                 <h2 class="dish-name">{{ dish.name }}</h2>
                 <p class="dish-description">{{ dish.description }}</p>
+                <p class="dish-price">{{ dish.price }}₽</p>
 
                 <div class="action-buttons">
                     <form method="post" action="{% url 'add_to_cart' %}">
@@ -28,14 +32,14 @@
                         <input type="hidden" name="dish_id" value="{{ dish.id }}">
                         <input type="hidden" name="dish_name" value="{{ dish.name }}">
                         <input type="hidden" name="dish_price" value="{{ dish.price }}">
-                        <input type="hidden" name="dish_image" value="{{ dish.image }}">
+                        <input type="hidden" name="dish_image" value="{{ dish.image.url }}">
 
                         <div class="quantity-controls">
                             <label for="quantity">Количество:</label>
                             <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-input">
                         </div>
 
-                        <button type="submit" class="add-button">Добавить</button>
+                        <button type="submit" class="add-button">Добавить в корзину</button>
                     </form>
                 </div>
             </div>

@@ -413,11 +413,9 @@ body {
 .modal-footer button:hover {
     background-color: #1d2c3a;
 }
-/* --- Стили для нового модального окна добавления блюда --- */
 #addDishModal .modal-content {
-    /* Унаследует стили от .modal-content, можно уточнить при необходимости */
-    width: 60%; /* Ширина чуть больше */
-    max-width: 600px; /* Максимальная ширина */
+    width: 60%;
+    max-width: 600px;
 }
 
 #addDishModal .form-group {
@@ -445,7 +443,6 @@ body {
 }
 
 #addDishModal textarea {
-    resize: vertical; /* Позволяет изменять высоту */
+    resize: vertical;
     min-height: 80px;
 }
-/* --- Конец стилей для нового модального окна --- */

@@ -177,23 +177,20 @@
     }
 
     function payAndRedirect() {
-        // Закрываем модальное окно
         closeModal();
-        // Редиректим на календарь
         window.location.href = "{% url 'calendar' %}";
     }
 
     document.getElementById('time').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, ''); // Убираем все не-цифры
+        let value = e.target.value.replace(/\D/g, '');
 
         if (value.length > 4) {
-            value = value.substring(0, 4); // Ограничиваем до 4 цифр
+            value = value.substring(0, 4);
         }
 
         let hours = value.substring(0, 2);
         let minutes = value.substring(2, 4);
 
-        // Ограничиваем часы до 23, минуты до 59
         if (hours > 23) hours = '23';
         if (minutes > 59) minutes = '59';
 

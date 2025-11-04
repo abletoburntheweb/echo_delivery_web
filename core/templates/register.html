@@ -28,7 +28,7 @@
             const phoneInput = document.getElementById('phone');
 
             phoneInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, ''); // Убираем все не-цифры
+                let value = e.target.value.replace(/\D/g, '');
                 let formattedValue = '+7(';
 
                 if (value.length > 1) {

@@ -19,10 +19,9 @@
     <div class="full-screen-menu">
         <a href="{{ previous_url }}" class="back-button">Назад</a>
 
-        <!-- Форма для редактирования блюда -->
-        <form method="post" enctype="multipart/form-data" class="dish-detail-card">
+        <form method="post" action="{% url 'update_dish' dish.id %}" enctype="multipart/form-data" class="dish-detail-card">
             {% csrf_token %}
-            <input type="hidden" name="dish_id" value="{{ dish.id }}">
+                <input type="hidden" name="dish_id" value="{{ dish.id }}">
 
             <div class="dish-header">
                 <h2 class="dish-name">{{ dish.name }}</h2>
@@ -51,14 +50,12 @@
             </div>
         </form>
 
-        <!-- Форма добавления в корзину (вне основной формы) -->
         <div class="action-buttons">
             <form method="post" action="{% url 'add_to_cart' %}">
                 {% csrf_token %}
                 <input type="hidden" name="dish_id" value="{{ dish.id }}">
                 <input type="hidden" name="dish_name" value="{{ dish.name }}">
                 <input type="hidden" name="dish_price" value="{{ dish.price }}">
-                <!-- Важно: используем .url для правильного пути к изображению -->
                 <input type="hidden" name="dish_image" value="{{ dish.image.url }}">
 
                 <div class="quantity-controls">
