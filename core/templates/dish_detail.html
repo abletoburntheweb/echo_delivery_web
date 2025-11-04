@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{{ dish.name }} | ECHO Corp.</title> <!-- <-- Использует переменную dish -->
+    <title>{{ dish.name }} | ECHO Corp.</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/dish_detail.css' %}">
 </head>
@@ -15,20 +15,20 @@
     <div class="full-screen-menu">
         <a href="{% url 'menu' %}" class="back-button">Назад</a>
 
-        <div class="dish-detail-card"> <!-- <-- Контейнер с деталями -->
-            <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image"> <!-- <-- Использует dish -->
+        <div class="dish-detail-card">
+            <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">
 
-            <div class="dish-content"> <!-- <-- Контент -->
-                <h2 class="dish-name">{{ dish.name }}</h2> <!-- <-- Использует dish -->
-                <p class="dish-description">{{ dish.description }}</p> <!-- <-- Использует dish -->
+            <div class="dish-content">
+                <h2 class="dish-name">{{ dish.name }}</h2>
+                <p class="dish-description">{{ dish.description }}</p>
 
                 <div class="action-buttons">
                     <form method="post" action="{% url 'add_to_cart' %}">
                         {% csrf_token %}
-                        <input type="hidden" name="dish_id" value="{{ dish.id }}"> <!-- <-- Использует dish -->
-                        <input type="hidden" name="dish_name" value="{{ dish.name }}"> <!-- <-- Использует dish -->
-                        <input type="hidden" name="dish_price" value="{{ dish.price }}"> <!-- <-- Использует dish -->
-                        <input type="hidden" name="dish_image" value="{{ dish.image }}"> <!-- <-- Использует dish -->
+                        <input type="hidden" name="dish_id" value="{{ dish.id }}">
+                        <input type="hidden" name="dish_name" value="{{ dish.name }}">
+                        <input type="hidden" name="dish_price" value="{{ dish.price }}">
+                        <input type="hidden" name="dish_image" value="{{ dish.image }}">
 
                         <div class="quantity-controls">
                             <label for="quantity">Количество:</label>

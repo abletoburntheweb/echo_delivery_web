@@ -1,7 +1,7 @@
-/* === Общие стили === */
+/* static/core/css/_menu.css */
 body {
     font-family: Arial, sans-serif;
-    background-color: #fdf9f4; /* Светлый фон */
+    background-color: #fdf9f4;
     margin: 0;
     padding: 0;
     display: flex;

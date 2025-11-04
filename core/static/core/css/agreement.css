@@ -1,3 +1,4 @@
+/* static/core/css/agreement.css */
 body {
     font-family: Arial, sans-serif;
     background-color: #fdf9f4;
@@ -45,7 +46,6 @@ body {
     background-color: #6a4c3a;
 }
 
-/* === Контейнер соглашения — белый, как в мобильном приложении === */
 .main-content {
     flex-grow: 1;
     padding: 20px;
@@ -53,7 +53,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #885F3A1A; /* hexColor('#885F3A').withOpacity(0.1) */
+    background-color: #885F3A1A;
 }
 
 .agreement-container {
@@ -70,7 +70,6 @@ body {
     color: #333;
 }
 
-/* === Кнопка "Назад" === */
 .back-button {
     align-self: flex-start;
     background-color: #8b6a50;
@@ -87,7 +86,6 @@ body {
     background-color: #7a5c45;
 }
 
-/* === Заголовок соглашения === */
 .agreement-title {
     margin-top: 0;
     margin-bottom: 20px;
@@ -98,7 +96,6 @@ body {
     width: 100%;
 }
 
-/* === Текст соглашения === */
 .agreement-text {
     width: 100%;
     font-size: 16px;

@@ -17,13 +17,9 @@
             <h2>Данные профиля</h2>
             <form method="post">
                 {% csrf_token %}
-                <!-- Логин (username) -->
                 <input type="text" value="{{ user.username }}" readonly><br>
-                <!-- Почта (email) -->
                 <input type="email" value="{{ user.email }}" readonly><br>
-                <!-- Телефон - пока пусто, так как не храним -->
                 <input type="text" value="" readonly><br>
-                <!-- Пароль - показываем как ******** -->
                 <input type="password" value="********" readonly><br>
                 <div class="footer-links">
                     <a href="{% url 'agreement' %}" class="agreement-link">Договор/соглашение</a>

@@ -6,7 +6,6 @@
     <title>Админ Меню | ECHO Corp.</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_menu.css' %}">
-    <!-- Стили для модального окна теперь в admin_menu.css -->
 </head>
 <body>
     <div class="header">
@@ -17,7 +16,6 @@
         </div>
     </div>
     <div class="full-screen-menu">
-        <!-- Кнопка "Добавить" -->
         <button class="add-dish-btn" onclick="openModal()">Добавить</button>
 
         <div class="search-bar">
@@ -25,26 +23,29 @@
             <button class="search-btn">🔍</button>
         </div>
 
-        <div class="menu-grid">
-            {% for dish in dishes %}
-                <a href="{% url 'admin_dish_detail' dish.id %}" class="dish-card-link">
-                    <div class="dish-card">
-                        <img src="{{ dish.image }}" alt="{{ dish.name }}" class="dish-image">
-                        <div class="dish-info">
-                            <h3 class="dish-name">{{ dish.name }}</h3>
-                            <p class="dish-price">{{ dish.price }}₽</p>
-                        </div>
-                    </div>
-                </a>
-            {% endfor %}
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Категории</h3>
+                <ul id="category-list">
+                </ul>
+                <div class="category-controls">
+                    <button class="add-category-btn" onclick="addCategory()">+</button>
+                    <button class="remove-category-btn" onclick="removeCategory()">-</button>
+                </div>
+            </div>
+
+            <div class="content-area">
+                <div class="menu-grid" id="dish-grid">
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Подключаем модальное окно -->
     {% include 'core/partials/modal_category.html' %}
 
     <script>
-        // Функции для открытия/закрытия модального окна
+        let currentCategoryId = null;
+
         function openModal() {
             document.getElementById("myModal").style.display = "block";
         }
@@ -53,7 +54,6 @@
             document.getElementById("myModal").style.display = "none";
         }
 
-        // Закрытие модального окна при клике вне его содержимого
         window.onclick = function(event) {
             const modal = document.getElementById("myModal");
             if (event.target === modal) {
@@ -61,34 +61,139 @@
             }
         }
 
-        // Функция для добавления категории (пока виртуально)
         function addCategory() {
             const newCategoryName = prompt("Введите название новой категории:");
             if (newCategoryName && newCategoryName.trim() !== "") {
                 console.log("Попытка добавить категорию:", newCategoryName);
-                const select = document.getElementById("categorySelect");
-                const option = document.createElement("option");
-                option.value = "new_" + newCategoryName; // Виртуальное значение
-                option.text = newCategoryName;
-                select.add(option);
-                select.value = option.value; // Выберем новую категорию
+                const categoryList = document.getElementById("category-list");
+                const li = document.createElement("li");
+                li.innerHTML = `<span>${newCategoryName}</span>`;
+                li.dataset.categoryId = "new_" + newCategoryName;
+                li.addEventListener('click', function() {
+                    selectCategory(this.dataset.categoryId, this.querySelector('span').textContent);
+                });
+                categoryList.appendChild(li);
+                selectCategory(li.dataset.categoryId, newCategoryName);
             }
         }
 
-        // Функция для удаления категории (пока виртуально)
         function removeCategory() {
-            const select = document.getElementById("categorySelect");
-            const selectedValue = select.value;
-            if (selectedValue === "") {
+            const categoryList = document.getElementById("category-list");
+            const selectedLi = Array.from(categoryList.children).find(li => li.classList.contains('selected'));
+            if (!selectedLi) {
                 alert("Пожалуйста, выберите категорию для удаления.");
                 return;
             }
-            console.log("Попытка удалить категорию с ID:", selectedValue);
+            console.log("Попытка удалить категорию с ID:", selectedLi.dataset.categoryId);
             if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
-                 select.remove(select.selectedIndex); // Удаляет выбранный элемент
-                 select.value = ""; // Сбрасывает выбор
+                 selectedLi.remove();
+                 currentCategoryId = null;
+                 loadDishes();
             }
         }
+
+        function selectCategory(categoryId, categoryName) {
+            // Сбросим выделение всех категорий
+            const categoryItems = document.querySelectorAll("#category-list li");
+            categoryItems.forEach(item => item.classList.remove('selected'));
+
+            const selectedItem = Array.from(categoryItems).find(item => item.dataset.categoryId === categoryId);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+
+            currentCategoryId = categoryId;
+
+            loadDishes(categoryId, categoryName);
+        }
+
+        function loadDishes(categoryId = null, categoryName = '') {
+            const dishGrid = document.getElementById("dish-grid");
+            dishGrid.innerHTML = '';
+
+            if (categoryId) {
+                dishGrid.innerHTML = `<p>Загрузка блюд категории "${categoryName}"...</p>`;
+            } else {
+                dishGrid.innerHTML = '<p>Загрузка всех блюд...</p>';
+            }
+
+            const allDishes = [
+                {% for dish in dishes %}
+                    {
+                        id: {{ dish.id }},
+                        name: "{{ dish.name|escapejs }}",
+                        price: {{ dish.price }},
+                        image: "{{ dish.image|escapejs }}",
+                        categoryId: {{ dish.category.id }}
+                    },
+                {% endfor %}
+            ];
+
+            let filteredDishes = allDishes;
+            if (categoryId) {
+                filteredDishes = allDishes.filter(dish => dish.categoryId == categoryId);
+            }
+
+            dishGrid.innerHTML = '';
+            if (filteredDishes.length === 0) {
+                dishGrid.innerHTML = '<p>Нет блюд в этой категории.</p>';
+            } else {
+                filteredDishes.forEach(dish => {
+                    const dishCard = document.createElement('a');
+                    dishCard.href = "{% url 'admin_dish_detail' 0 %}".replace('0', dish.id); // Подставляем ID
+                    dishCard.className = 'dish-card-link';
+
+                    const card = document.createElement('div');
+                    card.className = 'dish-card';
+
+                    const img = document.createElement('img');
+                    img.src = dish.image;
+                    img.alt = dish.name;
+                    img.className = 'dish-image';
+
+                    const info = document.createElement('div');
+                    info.className = 'dish-info';
+
+                    const name = document.createElement('h3');
+                    name.className = 'dish-name';
+                    name.textContent = dish.name;
+
+                    const price = document.createElement('p');
+                    price.className = 'dish-price';
+                    price.textContent = `${dish.price}₽`;
+
+                    info.appendChild(name);
+                    info.appendChild(price);
+
+                    card.appendChild(img);
+                    card.appendChild(info);
+
+                    dishCard.appendChild(card);
+                    dishGrid.appendChild(dishCard);
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryList = document.getElementById("category-list");
+            const categories = [
+                {% for cat in categories %}
+                    { id: {{ cat.id }}, name: "{{ cat.name|escapejs }}" },
+                {% endfor %}
+            ];
+
+            categories.forEach(cat => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span>${cat.name}</span>`;
+                li.dataset.categoryId = cat.id;
+                li.addEventListener('click', function() {
+                    selectCategory(this.dataset.categoryId, this.querySelector('span').textContent);
+                });
+                categoryList.appendChild(li);
+            });
+
+            loadDishes();
+        });
     </script>
 </body>
 </html>

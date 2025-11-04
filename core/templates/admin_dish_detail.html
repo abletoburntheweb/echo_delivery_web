@@ -21,7 +21,7 @@
         <div class="dish-detail-card">
             <div class="dish-header">
                 <h2 class="dish-name">{{ dish.name }}</h2>
-                <button class="save-button">Сохранить</button>
+                <button id="save-dish-button" class="save-button">Сохранить</button>
             </div>
 
             <div class="image-container">
@@ -29,13 +29,13 @@
             </div>
 
             <div class="dish-content">
-                <input type="text" class="dish-name-input" value="{{ dish.name }}" placeholder="Имя блюда">
+                <input type="text" id="dish-name-input" class="dish-name-input" value="{{ dish.name }}" placeholder="Имя блюда">
 
-                <textarea class="dish-description-input" placeholder="Описание блюда">{{ dish.description }}</textarea>
+                <textarea id="dish-description-input" class="dish-description-input" placeholder="Описание блюда">{{ dish.description }}</textarea>
 
                 <div class="price-container">
                     <label for="dish-price">Цена:</label>
-                    <input type="number" id="dish-price" class="dish-price-input" value="{{ dish.price }}" step="0.01" placeholder="Цена">
+                    <input type="number" id="dish-price-input" class="dish-price-input" value="{{ dish.price }}" step="0.01" placeholder="Цена">
                 </div>
 
                 <div class="action-buttons">
@@ -57,5 +57,57 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const saveButton = document.getElementById('save-dish-button');
+
+        saveButton.addEventListener('click', function() {
+            const dishId = {{ dish.id }};
+            const newName = document.getElementById('dish-name-input').value;
+            const newDescription = document.getElementById('dish-description-input').value;
+            const newPrice = parseFloat(document.getElementById('dish-price-input').value);
+
+            if (isNaN(newPrice) || newName.trim() === '') {
+                alert('Пожалуйста, введите корректные имя и цену.');
+                return;
+            }
+
+            const postData = {
+                'dish_id': dishId,
+                'name': newName,
+                'description': newDescription,
+                'price': newPrice,
+                'csrfmiddlewaretoken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            };
+
+            // Используем URL, который ты определил в JavaScript в предыдущей версии
+            // или получаем его через шаблонный тег Django, если он есть в admin_dish_detail_view
+            // Но так как мы его не передавали, используем шаблонный тег здесь:
+            const updateUrl = '{% url "update_dish" dish.id %}';
+
+            fetch(updateUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams(postData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Успешное обновление - редирект на меню
+                    window.location.href = '{% url "admin_menu" %}'; // Используем шаблонный тег для URL меню
+                } else {
+                    response.text().then(text => {
+                        console.error('Ошибка сервера:', text);
+                        alert('Произошла ошибка при обновлении блюда. Проверьте консоль.');
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка сети:', error);
+                alert('Произошла ошибка при подключении к серверу.');
+            });
+        });
+    </script>
 </body>
 </html>
