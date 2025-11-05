@@ -4,18 +4,21 @@
     <meta charset="UTF-8">
     <title>Календарь | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/calendar.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/calendar.css' %}?v=2">
 </head>
 <body>
     <div class="header">
-    <span class="header-title">ECHO Corp.</span>
-    <a href="{% url 'profile' %}" class="profile-button">👤</a>
-</div>
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <span class="unused-button">📅</span>
+            <a href="{% url 'profile' %}" class="profile-button">👤</a>
+            <a href="{% url 'faq' %}" class="profile-button">❓</a>
+        </div>
+    </div>
     <div class="main-content">
         <div class="container">
             <div class="calendar-header">
     <h2 class="month-header">{{ month_name|capfirst }}</h2>
-    <a href="{% url 'faq' %}" class="faq-button">FAQ</a>
 </div>
             <div class="weekdays-grid">
                 <div class="weekday">Пн</div>

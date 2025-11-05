@@ -5,16 +5,18 @@
     <meta charset="UTF-8">
     <title>Часто задаваемые вопросы | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/faq.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/faq.css' %}?v=1">
 </head>
 <body>
     <div class="header">
-    <span class="header-title">ECHO Corp.</span>
-    <a href="{% url 'profile' %}" class="profile-button">👤</a>
-</div>
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'calendar' %}" class="profile-button">📅</a>
+            <a href="{% url 'profile' %}" class="profile-button">👤</a>
+            <span class="unused-button">❓</span>
+        </div>
+    </div>
     <div class="faq-full-container">
-        <a href="{% url 'calendar' %}" class="back-button">←</a>
-
         <h2 class="faq-title">Часто задаваемые вопросы</h2>
 
         <div class="faq-content">
