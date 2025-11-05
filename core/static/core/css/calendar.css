@@ -1,7 +1,6 @@
-/* static/core/css/calendar.css */
 body {
     font-family: Arial, sans-serif;
-    background-color: #fdf9f4;
+    background-color: white;
     margin: 0;
     padding: 0;
     display: flex;
@@ -10,9 +9,10 @@ body {
     min-height: 100vh;
     box-sizing: border-box;
 }
+
 .header {
     width: 100%;
-    background-color: #8b6a50;
+    background-color: #8B694D;
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -70,6 +70,7 @@ body {
 .unused-button:hover {
     background-color: #6A4A2E;
 }
+
 .main-content {
     display: flex;
     justify-content: center;
@@ -79,41 +80,41 @@ body {
     padding: 20px;
     box-sizing: border-box;
 }
+
 .container {
-    background-color: #b79d80;
+    background-color: #8B694D;
     padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
     text-align: center;
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
     box-sizing: border-box;
 }
 
 .month-header {
-    margin-top: 0;
-    margin-bottom: 10px;
+    margin: 0 0 20px 0;
     color: white;
-    font-size: 20px;
+    font-size: 22px;
     font-weight: bold;
 }
 
 .weekdays-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
-    margin-bottom: 10px;
+    gap: 8px;
+    margin-bottom: 12px;
     justify-items: center;
     align-items: center;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .weekday {
     font-weight: bold;
     color: white;
     font-size: 14px;
-    width: 40px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -122,45 +123,32 @@ body {
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 10px;
+    gap: 8px;
     margin-bottom: 20px;
     justify-items: center;
     align-items: center;
     width: 100%;
-    box-sizing: border-box;
-}
-
-.empty-cell {
-    width: 40px;
-    height: 40px;
-    background: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .day-btn {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     font-size: 16px;
-    color: #8b6a50;
-    cursor: pointer;
-    transition: background-color 0.2s, transform 0.1s, border 0.2s;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
     border: 2px solid transparent;
-    background: none;
-    padding: 0;
-    margin: 0;
-    box-sizing: border-box;
-    user-select: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .day-btn:hover {
-    border: 2px solid white;
-    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: white;
 }
 
 .day-btn:active {
@@ -168,27 +156,25 @@ body {
 }
 
 .day-btn.selected {
-    background-color: #8b6a50;
-    color: white;
-    border: 2px solid white;
-    border-radius: 50%;
+    background-color: #7A5436;
+    border-color: white;
 }
 
 .accept-button {
-    background-color: #8b6a50;
+    background-color: #7A5436;
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
+    padding: 10px 50px;
+    border-radius: 25px;
     cursor: pointer;
     font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s;
     margin-top: 10px;
-    box-sizing: border-box;
-    align-self: flex-end;
 }
 
 .accept-button:hover {
-    background-color: #7a5c45;
+    background-color: #6A4A2E;
 }
 
 .calendar-actions {
@@ -196,13 +182,13 @@ body {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .faq-button {
-    background-color: #8b6a50;
+    background-color: #7A5436;
     color: white;
-    padding: 8px 12px;
+    padding: 8px 16px;
     border-radius: 20px;
     text-decoration: none;
     font-size: 14px;
@@ -210,5 +196,5 @@ body {
 }
 
 .faq-button:hover {
-    background-color: #7a5c45;
+    background-color: #6A4A2E;
 }
