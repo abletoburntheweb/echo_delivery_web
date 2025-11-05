@@ -131,7 +131,6 @@ DATABASES = {
             Phone VARCHAR(20),
             Email VARCHAR(255),
             Address TEXT
-            -- PasswordHash НЕ нужен — удалил!
         );
         
         -- Таблица Заказ
