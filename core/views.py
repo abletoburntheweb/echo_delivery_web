@@ -47,17 +47,8 @@ def register_view(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
 
-        if not all([company_name, address, phone, email, password]):
-            messages.error(request, "Все поля обязательны для заполнения.")
-            return render(request, 'register.html', {
-                'company_name': company_name,
-                'address': address,
-                'phone': phone,
-                'email': email
-            })
-
         if User.objects.filter(username=email).exists():
-            messages.error(request, "Пользователь с таким email уже зарегистрирован.")
+            messages.error(request, "Кажется email уже занят.")
             return render(request, 'register.html', {
                 'company_name': company_name,
                 'address': address,
