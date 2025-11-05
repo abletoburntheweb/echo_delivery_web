@@ -1,13 +1,17 @@
 from PIL import Image
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import ProtectedError
-from django.shortcuts import render, redirect, get_object_or_404 
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
+from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category
+from .models import Dish, Category, Company
 from django.core.exceptions import ValidationError
+
 from django.db import IntegrityError
 
 def login_view(request):
@@ -37,7 +41,54 @@ def login_view(request):
 
 def register_view(request):
     if request.method == 'POST':
-        return redirect('login')
+        company_name = request.POST.get('company_name')
+        address = request.POST.get('address')
+        phone = request.POST.get('phone')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if not all([company_name, address, phone, email, password]):
+            messages.error(request, "Все поля обязательны для заполнения.")
+            return render(request, 'register.html', {
+                'company_name': company_name,
+                'address': address,
+                'phone': phone,
+                'email': email
+            })
+
+        if User.objects.filter(username=email).exists():
+            messages.error(request, "Пользователь с таким email уже зарегистрирован.")
+            return render(request, 'register.html', {
+                'company_name': company_name,
+                'address': address,
+                'phone': phone,
+                'email': email
+            })
+
+        try:
+            with transaction.atomic():
+                user = User.objects.create_user(
+                    username=email,
+                    email=email,
+                    password=password
+                )
+                company = Company.objects.create(
+                    name=company_name,
+                    address=address,
+                    phone=phone,
+                    email=email
+                )
+                login(request, user)
+                return redirect('calendar')
+        except Exception as e:
+            print(f"[ERROR] Регистрация не удалась: {e}")
+            messages.error(request, f"Ошибка при регистрации: {str(e)}")
+            return render(request, 'register.html', {
+                'company_name': company_name,
+                'address': address,
+                'phone': phone,
+                'email': email
+            })
     else:
         return render(request, 'register.html')
 
@@ -196,7 +247,7 @@ def menu_view(request):
 @login_required
 def dish_detail_view(request, dish_id):
     print(f"Запрошенное dish_id: {dish_id}")
-    dish = get_object_or_404(Dish, id=dish_id) 
+    dish = get_object_or_404(Dish, id=dish_id)
     print(f"Найдено блюдо из базы: {dish}")
     return render(request, 'dish_detail.html', {'dish': dish})
 
@@ -288,12 +339,22 @@ def profile_view(request):
         logout(request)
         return redirect('login')
 
+    try:
+        company = Company.objects.get(email=request.user.email)
+    except Company.DoesNotExist:
+        company = None
+
+    context = {
+        'user': request.user,
+        'company': company,
+    }
+
     if request.user.is_superuser:
         template_name = 'admin_profile.html'
     else:
         template_name = 'profile.html'
 
-    return render(request, template_name, {'user': request.user})
+    return render(request, template_name, context)
 
 @login_required
 def agreement_view(request):
