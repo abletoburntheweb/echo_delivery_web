@@ -107,52 +107,52 @@ DATABASES = {
     *   Вставьте следующий SQL-скрипт и выполните его:
 
         ```sql
-        -- Таблица Категория (Django модель Category)
-        CREATE TABLE Категория (
+        -- Таблица Категория
+        CREATE TABLE Category (
             ID_CAT SERIAL PRIMARY KEY,
-            Name VARCHAR(255) NOT NULL UNIQUE -- Уникальность имени категории
+            Name VARCHAR(255) NOT NULL UNIQUE
         );
-
-        -- Таблица Блюдо (Django модель Dish)
-        CREATE TABLE Блюдо (
+        
+        -- Таблица Блюдо
+        CREATE TABLE Dish (
             ID_BLU SERIAL PRIMARY KEY,
             FK_ID_CAT INTEGER NOT NULL,
             Name VARCHAR(255) NOT NULL,
-            DESCRIPTION TEXT, -- Переименовано с DESC
+            DESCRIPTION TEXT,
             IMG VARCHAR(255) NOT NULL,
             Price DECIMAL(10,2) DEFAULT 0.00,
-            FOREIGN KEY (FK_ID_CAT) REFERENCES Категория(ID_CAT) ON DELETE RESTRICT
+            FOREIGN KEY (FK_ID_CAT) REFERENCES Category(ID_CAT) ON DELETE RESTRICT
         );
-
-        -- Таблица Контора (Django модель Company или расширение User)
-        CREATE TABLE Контора (
+        
+        -- Таблица Контора
+        CREATE TABLE Company (
             ID_COMPANY SERIAL PRIMARY KEY,
             Name VARCHAR(255) NOT NULL,
             Phone VARCHAR(20),
             Email VARCHAR(255),
-            PasswordHash VARCHAR(255) NOT NULL, -- Лучше не хранить хэш напрямую, Django сам шифрует пароли
             Address TEXT
+            -- PasswordHash НЕ нужен — удалил!
         );
-
-        -- Таблица Заказ (Django модель Order)
-        CREATE TABLE Заказ (
+        
+        -- Таблица Заказ
+        CREATE TABLE Ordr (
             ID_ORDER SERIAL PRIMARY KEY,
             FK_ID_COMPANY INTEGER NOT NULL,
             DeliveryDate DATE NOT NULL,
             DeliveryTime TIME,
             DeliveryAddress TEXT NOT NULL,
             Status VARCHAR(20) DEFAULT 'новый',
-            FOREIGN KEY (FK_ID_COMPANY) REFERENCES Контора(ID_COMPANY) ON DELETE RESTRICT
+            FOREIGN KEY (FK_ID_COMPANY) REFERENCES Company(ID_COMPANY) ON DELETE RESTRICT
         );
-
-        -- Таблица СоставЗаказа (Django модель OrderItem)
-        CREATE TABLE СоставЗаказа (
+        
+        -- Таблица СоставЗаказа
+        CREATE TABLE OrdrItem (
             ID_ITEM SERIAL PRIMARY KEY,
             FK_ID_ORDER INTEGER NOT NULL,
             FK_ID_BLU INTEGER NOT NULL,
             Quantity INTEGER NOT NULL CHECK (Quantity > 0),
-            FOREIGN KEY (FK_ID_ORDER) REFERENCES Заказ(ID_ORDER) ON DELETE CASCADE,
-            FOREIGN KEY (FK_ID_BLU) REFERENCES Блюдо(ID_BLU) ON DELETE RESTRICT
+            FOREIGN KEY (FK_ID_ORDER) REFERENCES Ordr(ID_ORDER) ON DELETE CASCADE,
+            FOREIGN KEY (FK_ID_BLU) REFERENCES Dish(ID_BLU) ON DELETE RESTRICT
         );
         ```
     *   **Порядок важен:** `Категория` и `Контора` создаются первыми, затем `Блюдо` (ссылающееся на `Категория`), `Заказ` (ссылающийся на `Контора`), и наконец `СоставЗаказа` (ссылающаяся на `Заказ` и `Блюдо`).
