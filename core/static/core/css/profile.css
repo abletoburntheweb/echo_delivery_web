@@ -34,25 +34,6 @@ body {
 }
 
 .profile-button {
-    background-color: #7A5436;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 50%;
-    text-decoration: none;
-    font-size: 16px;
-    transition: background-color 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-}
-
-.profile-button:hover {
-    background-color: #6A4A2E;
-}
-
-.unused-button {
     background-color: #7a5c45;
     color: white;
     padding: 5px 10px;
@@ -67,8 +48,27 @@ body {
     height: 32px;
 }
 
-.unused-button:hover {
+.profile-button:hover {
     background-color: #6a4c3a;
+}
+
+.unused-button {
+    background-color: #7A5436;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.unused-button:hover {
+    background-color: #6A4A2E;
 }
 
 .main-content {
