@@ -28,8 +28,11 @@ wheels/
 venv/
 env/
 ENV/
-# Игнорируем конкретное твоё виртуальное окружение
-echodel/ 
+echodel/Scripts/
+echodel/Lib/
+echodel/Include/
+echodel/pyvenv.cfg
+
 
 # IDEs
 .idea/
