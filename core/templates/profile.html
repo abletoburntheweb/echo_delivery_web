@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Профиль | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/profile.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/profile.css' %}?v=2"> <!-- увеличил версию -->
 </head>
 <body>
     <div class="header">
@@ -17,10 +17,10 @@
             <h2>Данные профиля</h2>
             <form method="post">
                 {% csrf_token %}
-                <input type="text" value="{{ user.username }}" readonly><br>
+                <input type="text" value="{{ company.name|default:'Не указано' }}" readonly><br>
+                <input type="text" value="{{ company.phone|default:'Не указано' }}" readonly><br>
+                <input type="text" value="{{ company.address|default:'Не указано' }}" readonly><br>  <!-- ← ДОБАВЛЕНО -->
                 <input type="email" value="{{ user.email }}" readonly><br>
-                <input type="text" value="" readonly><br>
-                <input type="password" value="********" readonly><br>
                 <div class="footer-links">
                     <a href="{% url 'agreement' %}" class="agreement-link">Договор/соглашение</a>
                     <button type="submit" class="logout-button">Выйти</button>
