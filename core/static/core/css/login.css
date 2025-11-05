@@ -32,7 +32,7 @@ body {
 }
 
 .container {
-    background-color: #b79d80;
+    background-color: #8B694D;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -63,7 +63,7 @@ input[type="password"] {
 }
 
 button {
-    background-color: #8b6a50;
+    background-color: #7A5436;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -76,7 +76,7 @@ button {
 }
 
 button:hover {
-    background-color: #7a5c45;
+    background-color: #6A4A2E;
 }
 
 /* === Стили для ссылок === */
