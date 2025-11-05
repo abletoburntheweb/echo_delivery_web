@@ -1,88 +1,73 @@
-# core/models.py
 from django.db import models
-from django.contrib.auth.models import User
 
 class Company(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id_company')
-    name = models.CharField(max_length=255, verbose_name="Название", db_column='name')
-    phone = models.CharField(max_length=20, verbose_name="Телефон", blank=True, null=True, db_column='phone')
-    email = models.EmailField(verbose_name="Email", blank=True, null=True, db_column='email')
-    address = models.TextField(verbose_name="Адрес", blank=True, null=True, db_column='address')
+    id_company = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField()
+    address = models.TextField()
+
+    class Meta:
+        db_table = 'company'
+        verbose_name = 'Компания'
 
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name = "Контора"
-        verbose_name_plural = "Конторы"
-        db_table = 'Контора'
-        managed = False
 
 class Category(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id_cat')
-    name = models.CharField(max_length=255, verbose_name="Название категории", unique=True, db_column='name')
+    id_category = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+
+    class Meta:
+        db_table = 'category'
+        verbose_name = 'Категория'
 
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name = "Категория"
-        verbose_name_plural = "Категории"
-        db_table = 'Категория'
-        managed = False
 
 class Dish(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id_blu')
-    category = models.ForeignKey(Category, on_delete=models.RESTRICT, db_column='fk_id_cat', verbose_name="Категория")
-    name = models.CharField(max_length=255, verbose_name="Название", db_column='name')
-    description = models.TextField(verbose_name="Описание", blank=True, null=True, db_column='description')
-    image = models.ImageField(upload_to='dishes/', verbose_name="Изображение", db_column='img')
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена", default=0.00, db_column='price')
+    id_dish = models.AutoField(primary_key=True)
+    id_category = models.ForeignKey(Category,on_delete=models.CASCADE,db_column='id_category')
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    img = models.CharField(max_length=255, blank=True, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        db_table = 'dish'
+        verbose_name = 'Блюдо'
 
     def __str__(self):
         return self.name
 
-    class Meta:
-        verbose_name = "Блюдо"
-        verbose_name_plural = "Блюда"
-        db_table = 'Блюдо'
-        managed = False
 
-class Order(models.Model):
-    STATUS_CHOICES = [
-        ('новый', 'Новый'),
-        ('в_работе', 'В работе'),
-        ('готов', 'Готов'),
-        ('доставлен', 'Доставлен'),
-        ('отменен', 'Отменен'),
-    ]
-    id = models.AutoField(primary_key=True, db_column='id_order')
-    company = models.ForeignKey(Company, on_delete=models.RESTRICT, db_column='fk_id_company', verbose_name="Контора")
-    delivery_date = models.DateField(verbose_name="Дата доставки", db_column='deliverydate')
-    delivery_time = models.TimeField(verbose_name="Время доставки", blank=True, null=True, db_column='deliverytime')
-    delivery_address = models.TextField(verbose_name="Адрес доставки", db_column='deliveryaddress')
-    status = models.CharField(max_length=20, verbose_name="Статус", choices=STATUS_CHOICES, default='новый', db_column='status')
+class Ordr(models.Model):
+    id_ordr = models.AutoField(primary_key=True)
+    id_company = models.ForeignKey(Company,on_delete=models.CASCADE,db_column='id_company')
+    delivery_date = models.DateField()
+    delivery_time = models.TimeField(blank=True, null=True)
+    delivery_address = models.TextField()
+    status = models.CharField(max_length=20, default='новый')
+
+    class Meta:
+        db_table = 'ordr'
+        verbose_name = 'Заказ'
 
     def __str__(self):
-        return f"Заказ {self.id} от {self.company.name}"
+        return f"Заказ №{self.id_ordr} от {self.delivery_date}"
+
+
+class OrdrItem(models.Model):
+    id_ordritem = models.AutoField(primary_key=True)
+    id_ordr = models.ForeignKey(Ordr,on_delete=models.CASCADE,db_column='id_ordr')
+    id_dish = models.ForeignKey(Dish,on_delete=models.CASCADE,db_column='id_dish')
+    quantity = models.IntegerField(default=1)
 
     class Meta:
-        verbose_name = "Заказ"
-        verbose_name_plural = "Заказы"
-        db_table = 'Заказ'
-        managed = False
-
-class OrderItem(models.Model):
-    id = models.AutoField(primary_key=True, db_column='id_item')
-    order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE, db_column='fk_id_order', verbose_name="Заказ")
-    dish = models.ForeignKey(Dish, on_delete=models.RESTRICT, db_column='fk_id_blu', verbose_name="Блюдо")
-    quantity = models.PositiveIntegerField(verbose_name="Количество", db_column='quantity')
+        db_table = 'ordritem'
+        verbose_name_plural = 'Позиции заказов'
 
     def __str__(self):
-        return f"{self.quantity} x {self.dish.name}"
-
-    class Meta:
-        verbose_name = "Элемент заказа"
-        verbose_name_plural = "Элементы заказа"
-        db_table = 'СоставЗаказа'
-        managed = False
+        return f"{self.quantity} × {self.id_dish.name} (заказ №{self.id_ordr.id_ordr})"
