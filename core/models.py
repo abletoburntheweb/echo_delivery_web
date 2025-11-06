@@ -46,9 +46,9 @@ class Dish(models.Model):
 class Ordr(models.Model):
     id_order = models.AutoField(primary_key=True)
     id_company = models.ForeignKey(Company,on_delete=models.CASCADE,db_column='fk_id_company')
-    delivery_date = models.DateField()
-    delivery_time = models.TimeField(blank=True, null=True)
-    delivery_address = models.TextField()
+    delivery_date = models.DateField(db_column='deliverydate')
+    delivery_time = models.TimeField(blank=True, null=True, db_column='deliverytime')
+    delivery_address = models.TextField(db_column='deliveryaddress')
     status = models.CharField(max_length=20, default='новый')
 
     class Meta:

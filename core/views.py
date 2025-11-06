@@ -9,7 +9,7 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category, Company
+from .models import Dish, Category, Company, Ordr
 from django.core.exceptions import ValidationError
 
 from django.db import IntegrityError
@@ -149,12 +149,9 @@ def delete_client_view(request, company_id):
 @user_passes_test(lambda u: u.is_superuser)
 def admin_calendar_view(request):
     today = datetime.now().date()
-    current_monday = today - timedelta(days=today.weekday())
-    start_date = current_monday + timedelta(weeks=1)
-
     days = []
-    for i in range(14):
-        day = start_date + timedelta(days=i)
+    for i in range(21):
+        day = today + timedelta(days=i)
         days.append({
             'date': day,
             'weekday': day.weekday(),
@@ -166,23 +163,43 @@ def admin_calendar_view(request):
         if selected_date_str:
             try:
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-                request.session['selected_date'] = selected_date_str
-                return redirect('cart')
+                request.session['selected_date_admin'] = selected_date_str
+                return redirect('admin_orders_by_date')
             except ValueError:
                 pass
 
-    selected_date_str = request.session.get('selected_date')
-    selected_date = None
-    if selected_date_str:
-        try:
-            selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-        except ValueError:
-            pass
+    return render(request, 'admin_calendar.html', {'days': days})
 
-    return render(request, 'admin_calendar.html', {
-        'days': days,
+@user_passes_test(lambda u: u.is_superuser)
+def admin_orders_by_date_view(request):
+    selected_date_str = request.session.get('selected_date_admin')
+    if not selected_date_str:
+        return redirect('admin_calendar')
+
+    try:
+        selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
+    except ValueError:
+        return redirect('admin_calendar')
+
+    # Получаем все заказы на эту дату
+    orders = Ordr.objects.filter(delivery_date=selected_date).select_related('id_company')
+
+    return render(request, 'admin_orders_by_date.html', {
+        'orders': orders,
         'selected_date': selected_date
     })
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_delete_order_view(request, order_id):
+    if request.method == 'POST':
+        try:
+            order = get_object_or_404(Ordr, id_ordr=order_id)
+            order.delete()
+            messages.success(request, "Заказ успешно удалён.")
+        except Exception as e:
+            messages.error(request, f"Ошибка при удалении: {str(e)}")
+        return redirect('admin_orders_by_date')
+    return HttpResponse("Метод не разрешён.", status=405)
 
 @login_required
 def cart_view(request):
