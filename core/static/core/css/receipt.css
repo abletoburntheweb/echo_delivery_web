@@ -1,0 +1,166 @@
+/* static/core/css/receipt.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdf9f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.header {
+    width: 100%;
+    background-color: #8b6a50;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+}
+
+.profile-button {
+    background-color: #7a5c45;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.profile-button:hover {
+    background-color: #6a4c3a;
+}
+
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.receipt-container {
+    background-color: #8b6a50;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.receipt-white-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    color: black;
+}
+
+.receipt-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #8b6a50;
+}
+
+.receipt-date {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.receipt-items {
+    margin-bottom: 20px;
+}
+
+.receipt-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.item-name {
+    flex: 2;
+    font-weight: bold;
+    color: #333;
+}
+
+.item-quantity,
+.item-price,
+.item-total {
+    flex: 1;
+    text-align: center;
+    color: #333;
+}
+
+.divider {
+    border: none;
+    border-top: 1px solid #8b6a50;
+    margin: 15px 0;
+}
+
+.receipt-summary {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    margin-top: 10px;
+}
+
+.total {
+    font-size: 18px;
+    font-weight: bold;
+    color: #8b6a50;
+}
+
+.total-amount {
+    font-size: 20px;
+    color: #8b6a50;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.change-button,
+.confirm-button {
+    background-color: #8b6a50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.change-button:hover {
+    background-color: #7a5c45;
+}
+
+.confirm-button:hover {
+    background-color: #7a5c45;
+}

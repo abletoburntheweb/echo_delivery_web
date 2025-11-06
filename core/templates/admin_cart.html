@@ -1,0 +1,57 @@
+<!-- templates/core/admin_cart.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Админ Корзина | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_cart.css' %}">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+        </div>
+    </div>
+    <div class="main-content">
+        <div class="container">
+            <h2 class="cart-title">Админ Корзина ({{ item_count }} позиции)</h2>
+
+            <a href="{% url 'admin_menu' %}" class="add-item-btn">+</a>
+
+            {% if cart_items %}
+                <div class="cart-items">
+                    {% for item in cart_items %}
+                        <form method="post" action="{% url 'update_cart' %}" class="cart-item-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="dish_id" value="{{ item.id }}">
+                            <div class="cart-item">
+                                <span class="item-name">{{ item.name }}</span>
+                                <div class="quantity-controls">
+                                    <label for="quantity_{{ item.id }}">Кол-во:</label>
+                                    <input type="number" id="quantity_{{ item.id }}" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input">
+                                </div>
+                                <span class="item-price">{{ item.price|floatformat:2 }}₽</span>
+                                <button type="submit" class="save-btn">✓</button>
+                                <button type="button" class="remove-btn" onclick="this.closest('form').submit(); this.querySelector('input[name=quantity]').value=0; this.querySelector('input[name=quantity]').disabled=true;">×</button>
+                                <input type="hidden" name="remove" value="true">
+                            </div>
+                        </form>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="empty-cart">пока здесь пусто</p>
+            {% endif %}
+
+            <div class="cart-summary">
+                <div class="total">
+                    Итого: <span class="total-amount">{{ total|floatformat:2 }}₽</span>
+                </div>
+                <a href="{% url 'receipt' %}" class="time-button">Время</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!-- templates/core/faq.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Часто задаваемые вопросы | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/faq.css' %}?v=1">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'calendar' %}" class="profile-button">📅</a>
+            <a href="{% url 'profile' %}" class="profile-button">👤</a>
+            <span class="unused-button">❓</span>
+        </div>
+    </div>
+    <div class="faq-full-container">
+        <h2 class="faq-title">Часто задаваемые вопросы</h2>
+
+        <div class="faq-content">
+            <div class="faq-list">
+                <div class="faq-item">
+                    <div class="faq-question">Кто мы такие?</div>
+                    <div class="faq-answer">
+                        Наша компания занимается оптовой доставкой еды в офисы. Ну а так мы просто бедные студенты...
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Есть ли у нас сертификаты?</div>
+                    <div class="faq-answer">
+                        Конечно же у нас все есть. Ну в самом деле, кто бы нам разрешил еду продавать тогда?
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Как сделать заказ?</div>
+                    <div class="faq-answer">
+                        Выберите дату в календаре, добавьте блюда в корзину, нажмите "Время", затем "Согласовать".
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Можно ли отменить заказ?</div>
+                    <div class="faq-answer">
+                        Да, если заказ ещё не был передан на приготовление — вы можете отменить его в течение 2 часов.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">Какие способы оплаты?</div>
+                    <div class="faq-answer">
+                        Оплата наличными при получении, переводом на карту или через QR-код.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-box">
+            <h3>Обратная связь</h3>
+            <p><strong>TG:</strong> +7(922)425-56-55</p>
+            <p><strong>Email:</strong> echodel@gmail.com</p>
+        </div>
+    </div>
+</body>
+</html>

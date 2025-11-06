@@ -1,0 +1,107 @@
+/* static/core/css/agreement.css */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #fdf9f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+.header {
+    width: 100%;
+    background-color: #8b6a50;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+}
+
+.profile-button {
+    background-color: #7a5c45;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.profile-button:hover {
+    background-color: #6a4c3a;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #885F3A1A;
+}
+
+.agreement-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    max-width: 800px;
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #333;
+}
+
+.back-button {
+    align-self: flex-start;
+    background-color: #8b6a50;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    margin-bottom: 15px;
+    transition: background-color 0.2s;
+}
+
+.back-button:hover {
+    background-color: #7a5c45;
+}
+
+.agreement-title {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: #8b6a50;
+    text-align: center;
+    width: 100%;
+}
+
+.agreement-text {
+    width: 100%;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.agreement-text p {
+    margin: 10px 0;
+}
