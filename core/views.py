@@ -389,12 +389,30 @@ def admin_logout_view(request):
     return redirect('login')
 
 @user_passes_test(lambda u: u.is_superuser)
-@login_required
 def admin_menu_view(request):
     categories = Category.objects.all()
-    dishes = Dish.objects.select_related('category').all()
-    
+    dishes = Dish.objects.select_related('id_category').all()
     return render(request, 'admin_menu.html', {'dishes': dishes, 'categories': categories})
+
+@user_passes_test(lambda u: u.is_superuser)
+def get_dishes_by_category(request):
+    category_id = request.GET.get('category_id')
+    if not category_id:
+        return JsonResponse({'success': False, 'error': 'ID категории не передан.'}, status=400)
+    try:
+        dishes = Dish.objects.filter(category_id=category_id).select_related('category')
+        dish_list = []
+        for dish in dishes:
+            dish_list.append({
+                'id': dish.id_blu,
+                'name': dish.name,
+                'price': str(dish.price),
+                'image': dish.image.url,
+                'category_id': dish.category.id_cat
+            })
+        return JsonResponse({'success': True, 'dishes': dish_list})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 @login_required
 @user_passes_test(lambda u: u.is_superuser) 

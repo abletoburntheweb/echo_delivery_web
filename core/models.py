@@ -17,7 +17,7 @@ class Company(models.Model):
 
 
 class Category(models.Model):
-    id_category = models.AutoField(primary_key=True, db_column='id_category')
+    id_category = models.AutoField(primary_key=True, db_column='id_cat')
     name = models.CharField(max_length=255)
 
     class Meta:
@@ -28,8 +28,8 @@ class Category(models.Model):
 
 
 class Dish(models.Model):
-    id_dish = models.AutoField(primary_key=True)
-    id_category = models.ForeignKey(Category,on_delete=models.CASCADE,db_column='id_category')
+    id_dish = models.AutoField(primary_key=True,db_column='id_blu')
+    id_category = models.ForeignKey(Category,on_delete=models.CASCADE,db_column='fk_id_cat')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     img = models.CharField(max_length=255, blank=True, null=True)
