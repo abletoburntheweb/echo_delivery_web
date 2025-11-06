@@ -1,0 +1,72 @@
+<!-- templates/admin_dish_detail.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ dish.name }} | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_dish_detail.css' %}">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+        </div>
+    </div>
+
+    <div class="full-screen-menu">
+        <a href="{{ previous_url }}" class="back-button">Назад</a>
+
+        <form method="post" action="{% url 'update_dish' dish.id %}" enctype="multipart/form-data" class="dish-detail-card">
+            {% csrf_token %}
+                <input type="hidden" name="dish_id" value="{{ dish.id }}">
+
+            <div class="dish-header">
+                <h2 class="dish-name">{{ dish.name }}</h2>
+                <button type="submit" class="save-button">Сохранить</button>
+            </div>
+
+            <div class="image-container">
+                <img src="{{ dish.image.url }}" alt="{{ dish.name }}" class="dish-image">
+            </div>
+
+            <div class="dish-content">
+                <input type="text" name="name" class="dish-name-input" value="{{ dish.name }}" placeholder="Имя блюда" required>
+
+                <textarea name="description" class="dish-description-input" placeholder="Описание блюда">{{ dish.description }}</textarea>
+
+                <div class="price-container">
+                    <label for="dish-price">Цена:</label>
+                    <input type="number" name="price" class="dish-price-input" value="{{ dish.price }}" step="0.01" placeholder="Цена" required>
+                </div>
+
+                <div class="image-upload">
+                    <label for="image">Новое изображение (оставьте пустым, чтобы не менять):</label>
+                    <input type="file" name="image" id="image" accept="image/*">
+                </div>
+
+            </div>
+        </form>
+
+        <div class="action-buttons">
+            <form method="post" action="{% url 'add_to_cart' %}">
+                {% csrf_token %}
+                <input type="hidden" name="dish_id" value="{{ dish.id }}">
+                <input type="hidden" name="dish_name" value="{{ dish.name }}">
+                <input type="hidden" name="dish_price" value="{{ dish.price }}">
+                <input type="hidden" name="dish_image" value="{{ dish.image.url }}">
+
+                <div class="quantity-controls">
+                    <label for="quantity">Количество:</label>
+                    <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-input">
+                </div>
+
+                <button type="submit" class="add-button">Добавить в корзину</button>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

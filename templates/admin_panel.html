@@ -1,0 +1,58 @@
+<!-- templates/core/admin_panel.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель управления | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=2">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'admin_calendar' %}" class="profile-button">📅</a>
+            <span class="unused-button">📋</span>
+
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h2 class="panel-title">Панель управления</h2>
+
+            <div class="toggle-group">
+                <label class="toggle-label">
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="work-dates-toggle">
+                        <span class="toggle-slider"></span>
+                    </div>
+                    <span>Даты работ</span>
+                </label>
+                <div class="date-inputs">
+                    <input type="text" placeholder="с" size="2" readonly>
+                    <span>по</span>
+                    <input type="text" placeholder="по" size="2" readonly>
+                </div>
+            </div>
+
+            <div class="toggle-group">
+                <label class="toggle-label">
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="block-toggle">
+                        <span class="toggle-slider"></span>
+                    </div>
+                    <span>Блокировка</span>
+                </label>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <a href="{% url 'admin_clients' %}" class="panel-button">Клиенты</a>
+                <a href="#" class="panel-button">Ред. позиции</a>
+                <a href="#" class="panel-button">Заказы на завтра</a>
+                <a href="#" class="panel-button">Заказы на сегодня</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!-- templates/dish_detail.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ dish.name }} | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/dish_detail.css' %}">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <a href="{% url 'profile' %}" class="profile-button">👤</a>
+    </div>
+
+    <div class="full-screen-menu">
+        <a href="{% url 'menu' %}" class="back-button">Назад</a>
+
+        <div class="dish-detail-card">
+            <div class="image-container">
+                <img src="{{ dish.image.url }}" alt="{{ dish.name }}" class="dish-image">
+            </div>
+
+            <div class="dish-content">
+                <h2 class="dish-name">{{ dish.name }}</h2>
+                <p class="dish-description">{{ dish.description }}</p>
+                <p class="dish-price">{{ dish.price }}₽</p>
+
+                <div class="action-buttons">
+                    <form method="post" action="{% url 'add_to_cart' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="dish_id" value="{{ dish.id }}">
+                        <input type="hidden" name="dish_name" value="{{ dish.name }}">
+                        <input type="hidden" name="dish_price" value="{{ dish.price }}">
+                        <input type="hidden" name="dish_image" value="{{ dish.image.url }}">
+
+                        <div class="quantity-controls">
+                            <label for="quantity">Количество:</label>
+                            <input type="number" id="quantity" name="quantity" value="1" min="1" class="quantity-input">
+                        </div>
+
+                        <button type="submit" class="add-button">Добавить в корзину</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
