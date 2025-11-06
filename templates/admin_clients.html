@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Клиенты | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=3">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=2">
 </head>
 <body>
     <div class="header">
@@ -30,18 +30,16 @@
                     <table style="width: 100%; min-width: 800px; border-collapse: collapse; color: white; background-color: #2c3e50; border-radius: 10px; overflow: hidden;">
                         <thead>
                             <tr style="background-color: #34495e; font-weight: bold;">
-                                <th style="padding: 10px; text-align: left;">Код</th>
-                                <th style="padding: 10px; text-align: left;">Название фирмы</th>
-                                <th style="padding: 10px; text-align: left;">Телефон</th>
-                                <th style="padding: 10px; text-align: left;">Почта</th>
-                                <th style="padding: 10px; text-align: left;">Адрес</th>
-                                <th style="padding: 10px; text-align: center;">Действия</th>
+                                <th style="padding: 10px; text-align: center;">Название фирмы</th>
+                                <th style="padding: 10px; text-align: center;">Телефон</th>
+                                <th style="padding: 10px; text-align: center;">Почта</th>
+                                <th style="padding: 10px; text-align: center;">Адрес</th>
+                                <th style="padding: 10px; text-align: center;">Удаление</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for company in companies %}
                                 <tr style="border-bottom: 1px solid #34495e;">
-                                    <td style="padding: 10px;">{{ company.id_company }}</td>
                                     <td style="padding: 10px;">{{ company.name }}</td>
                                     <td style="padding: 10px;">{{ company.phone|default:"—" }}</td>
                                     <td style="padding: 10px;">{{ company.email|default:"—" }}</td>
