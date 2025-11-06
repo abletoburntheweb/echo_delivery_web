@@ -181,7 +181,6 @@ def admin_orders_by_date_view(request):
     except ValueError:
         return redirect('admin_calendar')
 
-    # Получаем все заказы на эту дату
     orders = Ordr.objects.filter(delivery_date=selected_date).select_related('id_company')
 
     return render(request, 'admin_orders_by_date.html', {
@@ -383,6 +382,11 @@ def profile_view(request):
 @login_required
 def agreement_view(request):
     return render(request, 'agreement.html')
+
+@login_required
+def admin_logout_view(request):
+    logout(request)
+    return redirect('login')
 
 @user_passes_test(lambda u: u.is_superuser)
 @login_required
