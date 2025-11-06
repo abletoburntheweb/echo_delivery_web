@@ -17,9 +17,7 @@
     </div>
     <div class="main-content">
         <div class="container">
-            <div class="calendar-header">
-    <h2 class="month-header">{{ month_name|capfirst }}</h2>
-</div>
+
             <div class="weekdays-grid">
                 <div class="weekday">Пн</div>
                 <div class="weekday">Вт</div>
@@ -29,6 +27,7 @@
                 <div class="weekday">Сб</div>
                 <div class="weekday">Вс</div>
             </div>
+
             <div class="calendar-grid">
                 {% for i in "0123456"|make_list %}
                     {% if i|add:"0" < days.0.weekday %}
@@ -39,6 +38,7 @@
                     <div class="day-btn{% if day_info.is_today %} selected{% endif %}" data-date="{{ day_info.date|date:'Y-m-d' }}">{{ day_info.date.day }}</div>
                 {% endfor %}
             </div>
+
             <form id="calendar-form" method="post">
                 {% csrf_token %}
                 <input type="hidden" id="selected-date" name="selected_date" value="">
