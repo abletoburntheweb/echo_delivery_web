@@ -86,17 +86,17 @@ def register_view(request):
 @login_required
 def calendar_view(request):
     today = datetime.now().date()
+    current_monday = today - timedelta(days=today.weekday())
+    start_date = current_monday + timedelta(weeks=1)
+
     days = []
     for i in range(14):
-        day = today + timedelta(days=i)
+        day = start_date + timedelta(days=i)
         days.append({
             'date': day,
             'weekday': day.weekday(),
             'is_today': day == today
         })
-
-    month_name = today.strftime('%B')
-    selected_date_str = None
 
     if request.method == 'POST':
         selected_date_str = request.POST.get('selected_date')
@@ -105,8 +105,7 @@ def calendar_view(request):
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
                 print(f"Дата выбрана: {selected_date}")
                 request.session['selected_date'] = selected_date_str
-                
-                return redirect('cart')  
+                return redirect('cart')
             except ValueError:
                 print("Неверный формат даты")
                 pass
@@ -121,37 +120,32 @@ def calendar_view(request):
 
     return render(request, 'calendar.html', {
         'days': days,
-        'month_name': month_name,
         'selected_date': selected_date
     })
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_calendar_view(request):
     today = datetime.now().date()
+    current_monday = today - timedelta(days=today.weekday())
+    start_date = current_monday + timedelta(weeks=1)
+
     days = []
     for i in range(14):
-        day = today + timedelta(days=i)
+        day = start_date + timedelta(days=i)
         days.append({
             'date': day,
             'weekday': day.weekday(),
             'is_today': day == today
         })
 
-    month_name = today.strftime('%B')
-    selected_date_str = None
-
     if request.method == 'POST':
         selected_date_str = request.POST.get('selected_date')
         if selected_date_str:
             try:
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-                print(f"Дата выбрана (админ): {selected_date}")
                 request.session['selected_date'] = selected_date_str
-                
-                return redirect('cart') 
-                
+                return redirect('cart')
             except ValueError:
-                print("Неверный формат даты")
                 pass
 
     selected_date_str = request.session.get('selected_date')
@@ -164,7 +158,6 @@ def admin_calendar_view(request):
 
     return render(request, 'admin_calendar.html', {
         'days': days,
-        'month_name': month_name,
         'selected_date': selected_date
     })
 
