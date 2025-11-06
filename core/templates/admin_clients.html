@@ -16,6 +16,7 @@
             {% endfor %}
         {% endif %}
         <div class="header-buttons">
+            <a href="{% url 'admin_logout' %}" class="profile-button">🚪</a>
             <a href="{% url 'admin_calendar' %}" class="unused-button">📅</a>
             <a href="{% url 'admin_panel' %}" class="profile-button">📋</a>
         </div>
