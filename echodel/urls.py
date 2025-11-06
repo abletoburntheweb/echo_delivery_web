@@ -20,6 +20,7 @@ urlpatterns = [
     path('admin/category/add/', views.add_category_view, name='add_category'),
     path('admin/category/delete/', views.delete_category_view, name='delete_category'),
     path('admin/dish/add/', views.add_dish_view, name='add_dish'),
+    path('admin/logout/', views.admin_logout_view, name='admin_logout'),
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
 ]
