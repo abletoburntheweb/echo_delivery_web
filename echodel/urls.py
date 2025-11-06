@@ -19,6 +19,7 @@ urlpatterns = [
     path('admin/clients/delete/<int:company_id>/', views.delete_client_view, name='delete_client'),
     path('admin/category/add/', views.add_category_view, name='add_category'),
     path('admin/category/delete/', views.delete_category_view, name='delete_category'),
+    path('admin/dish/list/', views.get_dishes_by_category, name='get_dishes_by_category'),
     path('admin/dish/add/', views.add_dish_view, name='add_dish'),
     path('admin/logout/', views.admin_logout_view, name='admin_logout'),
     path('admin/', admin.site.urls),
