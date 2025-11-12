@@ -20,8 +20,8 @@
 
     <div class="full-screen-menu">
         <div class="search-bar">
-            <input type="text" id="search-input" placeholder="Поиск...">
-            <button class="search-btn">🔍</button>
+            <input type="text" id="search-input" placeholder="Поиск по названию блюда...">
+            <button class="search-btn" id="search-button">🔍</button>
         </div>
 
         <div class="main-content">
@@ -40,6 +40,7 @@
 
     <script>
         let currentCategoryId = null;
+        let currentSearchQuery = '';
 
         function selectCategory(categoryId, categoryName) {
             const categoryItems = document.querySelectorAll("#category-list li");
@@ -58,56 +59,73 @@
             const dishGrid = document.getElementById("dish-grid");
             dishGrid.innerHTML = '';
 
+            let filteredDishes = allDishes;
+
             if (categoryId && categoryId !== 'all') {
-                dishGrid.innerHTML = `<p>Загрузка блюд категории "${categoryName}"...</p>`;
-                const filteredDishes = allDishes.filter(dish => dish.categoryId == categoryId);
-                renderDishes(filteredDishes);
+                filteredDishes = filteredDishes.filter(dish => dish.categoryId == categoryId);
+            }
+
+            if (currentSearchQuery) {
+                const query = currentSearchQuery.toLowerCase();
+                filteredDishes = filteredDishes.filter(dish =>
+                    dish.name.toLowerCase().includes(query)
+                );
+            }
+
+            if (filteredDishes.length === 0) {
+                let message = 'Нет блюд для отображения.';
+                if (currentSearchQuery) {
+                    message = `По запросу "${currentSearchQuery}" ничего не найдено.`;
+                }
+                dishGrid.innerHTML = `<p>${message}</p>`;
             } else {
-                dishGrid.innerHTML = '<p>Загрузка всех блюд...</p>';
-                renderDishes(allDishes);
+                renderDishes(filteredDishes);
             }
         }
 
         function renderDishes(dishes) {
             const dishGrid = document.getElementById("dish-grid");
             dishGrid.innerHTML = '';
-            if (dishes.length === 0) {
-                dishGrid.innerHTML = '<p>Нет блюд для отображения.</p>';
-            } else {
-                dishes.forEach(dish => {
-                    const dishCardLink = document.createElement('a');
-                    dishCardLink.href = "{% url 'dish_detail' 0 %}".replace('0', dish.id);
-                    dishCardLink.className = 'dish-card-link';
 
-                    const card = document.createElement('div');
-                    card.className = 'dish-card';
+            dishes.forEach(dish => {
+                const dishCardLink = document.createElement('a');
+                dishCardLink.href = "{% url 'dish_detail' 0 %}".replace('0', dish.id);
+                dishCardLink.className = 'dish-card-link';
 
-                    const img = document.createElement('img');
-                    img.src = "{{ MEDIA_URL }}" + dish.image;
-                    img.alt = dish.name;
-                    img.className = 'dish-image';
+                const card = document.createElement('div');
+                card.className = 'dish-card';
 
-                    const info = document.createElement('div');
-                    info.className = 'dish-info';
+                const img = document.createElement('img');
+                img.src = "{{ MEDIA_URL }}" + dish.image;
+                img.alt = dish.name;
+                img.className = 'dish-image';
 
-                    const name = document.createElement('h3');
-                    name.className = 'dish-name';
-                    name.textContent = dish.name;
+                const info = document.createElement('div');
+                info.className = 'dish-info';
 
-                    const price = document.createElement('p');
-                    price.className = 'dish-price';
-                    price.textContent = `${dish.price}₽`;
+                const name = document.createElement('h3');
+                name.className = 'dish-name';
+                name.textContent = dish.name;
 
-                    info.appendChild(name);
-                    info.appendChild(price);
+                const price = document.createElement('p');
+                price.className = 'dish-price';
+                price.textContent = `${dish.price}₽`;
 
-                    card.appendChild(img);
-                    card.appendChild(info);
+                info.appendChild(name);
+                info.appendChild(price);
 
-                    dishCardLink.appendChild(card);
-                    dishGrid.appendChild(dishCardLink);
-                });
-            }
+                card.appendChild(img);
+                card.appendChild(info);
+
+                dishCardLink.appendChild(card);
+                dishGrid.appendChild(dishCardLink);
+            });
+        }
+
+        function performSearch() {
+            const searchInput = document.getElementById('search-input');
+            currentSearchQuery = searchInput.value.trim();
+            loadDishes(currentCategoryId);
         }
 
         const allDishes = [
@@ -133,6 +151,8 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             const categoryList = document.getElementById("category-list");
+            const searchInput = document.getElementById('search-input');
+            const searchButton = document.getElementById('search-button');
 
             const allLi = document.createElement("li");
             allLi.innerHTML = `<span>Все</span>`;
@@ -152,6 +172,19 @@
                     selectCategory(this.dataset.categoryId, this.dataset.categoryName);
                 });
                 categoryList.appendChild(li);
+            });
+
+            searchButton.addEventListener('click', performSearch);
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(window.searchTimeout);
+                window.searchTimeout = setTimeout(performSearch, 300);
+            });
+
+            searchInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    performSearch();
+                }
             });
 
             selectCategory("all", "Все");
