@@ -186,9 +186,28 @@ def admin_orders_by_date_view(request):
 
     orders = Ordr.objects.filter(delivery_date=selected_date).select_related('id_company')
 
+    order_list = []
+    for order in orders:
+        total_amount = OrdrItem.objects.filter(
+            id_ordr=order
+        ).aggregate(
+            total=Sum(F('quantity') * F('id_dish__price'))
+        )['total'] or Decimal('0.00')
+
+        order_list.append({
+            'id': order.id_order,
+            'company': order.id_company.name,
+            'address': order.delivery_address,
+            'phone': order.id_company.phone,
+            'amount': total_amount,
+            'time': order.delivery_time.strftime('%H:%M') if order.delivery_time else '—',
+            'status': order.status
+        })
+
     return render(request, 'admin_orders_by_date.html', {
-        'orders': orders,
-        'selected_date': selected_date
+        'orders': order_list,
+        'selected_date': selected_date,
+        'title': f'Заказы на {selected_date.day} {["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"][selected_date.month - 1]} {selected_date.year} года'
     })
 
 @user_passes_test(lambda u: u.is_superuser)
