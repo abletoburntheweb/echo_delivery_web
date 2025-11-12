@@ -715,3 +715,66 @@ def admin_orders_tomorrow_view(request):
         'title': 'Заказы на завтра',
         'orders': order_list
     })
+
+
+@login_required
+def create_order_view(request):
+    if request.method == 'POST':
+        selected_date_str = request.session.get('selected_date')
+        if not selected_date_str:
+            messages.error(request, "Дата доставки не выбрана")
+            return redirect('calendar')
+
+        try:
+            company = Company.objects.get(email=request.user.email)
+
+
+            all_carts = request.session.get('carts', {})
+            cart_items = all_carts.get(selected_date_str, [])
+
+            if not cart_items:
+                messages.error(request, "Корзина пуста")
+                return redirect('cart')
+
+            delivery_address = request.POST.get('address')
+            delivery_time = request.POST.get('time')
+
+            if not delivery_address or not delivery_time:
+                messages.error(request, "Заполните адрес и время доставки")
+                return redirect('receipt')
+
+            with transaction.atomic():
+                order = Ordr.objects.create(
+                    id_company=company,
+                    delivery_date=selected_date_str,
+                    delivery_time=delivery_time,
+                    delivery_address=delivery_address,
+                    status='новый'
+                )
+
+                for item in cart_items:
+                    dish = Dish.objects.get(id_dish=item['id'])
+                    OrdrItem.objects.create(
+                        id_ordr=order,
+                        id_dish=dish,
+                        quantity=item['quantity']
+                    )
+
+
+                if selected_date_str in all_carts:
+                    del all_carts[selected_date_str]
+                    request.session['carts'] = all_carts
+                    request.session.modified = True
+
+                messages.success(request, f"Заказ №{order.id_order} успешно оформлен!")
+                return redirect('calendar')
+
+        except Company.DoesNotExist:
+            messages.error(request, "Компания не найдена")
+            return redirect('receipt')
+        except Exception as e:
+            print(f"Ошибка создания заказа: {e}")
+            messages.error(request, f"Ошибка оформления заказа: {str(e)}")
+            return redirect('receipt')
+
+    return redirect('receipt')

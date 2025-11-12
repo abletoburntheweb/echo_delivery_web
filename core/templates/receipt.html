@@ -9,9 +9,10 @@
 </head>
 <body>
     <div class="header">
-    <span class="header-title">ECHO Corp.</span>
-    <a href="{% url 'profile' %}" class="profile-button">👤</a>
-</div>
+        <span class="header-title">ECHO Corp.</span>
+        <a href="{% url 'profile' %}" class="profile-button">👤</a>
+    </div>
+
     <div class="main-content">
         <div class="receipt-container">
             <div class="receipt-white-box">
@@ -47,165 +48,95 @@
             </div>
         </div>
     </div>
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h3>Подтверждение заказа</h3>
 
-        <form id="confirmation-form">
-            <input type="text" id="address" name="address" placeholder="Адрес" required><br>
-            <input type="text" id="time" name="time" placeholder="Время (00:00)" required><br>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Подтверждение заказа</h3>
 
-            <div class="checkbox-group">
-    <label><input type="checkbox" name="agreement" value="account" checked> Что-то про аккаунт</label><br>
-    <label><input type="checkbox" name="agreement" value="all" checked> Вы соглашаетесь со всем</label><br>
-    <label><input type="checkbox" name="agreement" value="policy" checked> Политика конфиденциальности</label><br>
-</div>
+            <form id="confirmation-form" method="post" action="{% url 'create_order' %}">
+                {% csrf_token %}
+                <input type="text" id="address" name="address" placeholder="Адрес" required value="{{ user.company.address|default:'' }}"><br>
+                <input type="text" id="time" name="time" placeholder="Время (00:00)" required><br>
 
-            <div class="total-box">
-                <strong>Итого:</strong> <span id="modal-total">{{ total|floatformat:2 }}₽</span>
-            </div>
+                <div class="checkbox-group">
+                    <label><input type="checkbox" name="agreement" value="account" required> Что-то про аккаунт</label><br>
+                    <label><input type="checkbox" name="agreement" value="all" required> Вы соглашаетесь со всем</label><br>
+                    <label><input type="checkbox" name="agreement" value="policy" required> Политика конфиденциальности</label><br>
+                </div>
 
-            <button type="button" class="pay-button" onclick="payAndRedirect()">Оплатить</button>
-        </form>
+                <div class="total-box">
+                    <strong>Итого:</strong> <span id="modal-total">{{ total|floatformat:2 }}₽</span>
+                </div>
+
+                <button type="submit" class="pay-button">Оплатить</button>
+            </form>
+        </div>
     </div>
-</div>
 
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-        justify-content: center;
-        align-items: center;
-    }
-
-    .modal-content {
-        background-color: #8b6a50;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        max-width: 400px;
-        width: 90%;
-        color: white;
-        position: relative;
-    }
-
-    .close {
-        color: white;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    .close:hover {
-        color: #e0d0c0;
-    }
-
-    .modal-content h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        text-align: center;
-    }
-
-    input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        border: none;
-        border-radius: 20px;
-        font-size: 16px;
-        box-sizing: border-box;
-        background-color: white;
-        color: #333;
-    }
-
-    .radio-group {
-        margin: 15px 0;
-    }
-
-    .radio-group label {
-        display: block;
-        margin: 5px 0;
-        color: white;
-    }
-
-    .radio-group input[type="radio"] {
-        margin-right: 5px;
-    }
-
-    .total-box {
-        background-color: white;
-        color: #8b6a50;
-        padding: 10px;
-        border-radius: 8px;
-        margin: 15px 0;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    .pay-button {
-        background-color: #7a5c45;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 16px;
-        width: 100%;
-        margin-top: 10px;
-    }
-
-    .pay-button:hover {
-        background-color: #6a4c3a;
-    }
-</style>
-
-<script>
-    function openModal() {
-        document.getElementById('modal').style.display = 'flex';
-    }
-
-    function closeModal() {
-        document.getElementById('modal').style.display = 'none';
-    }
-
-    function payAndRedirect() {
-        closeModal();
-        window.location.href = "{% url 'calendar' %}";
-    }
-
-    document.getElementById('time').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-
-        if (value.length > 4) {
-            value = value.substring(0, 4);
+    <script>
+        function openModal() {
+            document.getElementById('modal').style.display = 'flex';
         }
 
-        let hours = value.substring(0, 2);
-        let minutes = value.substring(2, 4);
-
-        if (hours > 23) hours = '23';
-        if (minutes > 59) minutes = '59';
-
-        let formattedValue = '';
-        if (hours) formattedValue += hours;
-        if (minutes) formattedValue += ':' + minutes;
-
-        e.target.value = formattedValue;
-    });
-
-    document.getElementById('time').addEventListener('keypress', function(e) {
-        if (!/\d/.test(e.key)) {
-            e.preventDefault();
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
         }
-    });
-</script>
+
+        document.getElementById('time').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+
+            if (value.length > 4) {
+                value = value.substring(0, 4);
+            }
+
+            let hours = value.substring(0, 2);
+            let minutes = value.substring(2, 4);
+
+            if (hours > 23) hours = '23';
+            if (minutes > 59) minutes = '59';
+
+            let formattedValue = '';
+            if (hours) formattedValue += hours;
+            if (minutes) formattedValue += ':' + minutes;
+
+            e.target.value = formattedValue;
+        });
+
+        document.getElementById('time').addEventListener('keypress', function(e) {
+            if (!/\d/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // Валидация формы
+        document.getElementById('confirmation-form').addEventListener('submit', function(e) {
+            const checkboxes = document.querySelectorAll('input[name="agreement"]');
+            const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+            if (!allChecked) {
+                e.preventDefault();
+                alert('Пожалуйста, подтвердите все соглашения');
+                return false;
+            }
+
+            const timeInput = document.getElementById('time');
+            if (!timeInput.value.match(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)) {
+                e.preventDefault();
+                alert('Введите корректное время в формате ЧЧ:MM');
+                return false;
+            }
+
+            return true;
+        });
+
+        // Закрытие модалки по клику вне ее
+        window.addEventListener('click', function(e) {
+            const modal = document.getElementById('modal');
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>

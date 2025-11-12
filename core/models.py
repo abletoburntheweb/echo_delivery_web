@@ -28,8 +28,8 @@ class Category(models.Model):
 
 
 class Dish(models.Model):
-    id_dish = models.AutoField(primary_key=True,db_column='id_blu')
-    id_category = models.ForeignKey(Category, on_delete=models.CASCADE, db_column='fk_id_cat', related_name='dishes') 
+    id_dish = models.AutoField(primary_key=True, db_column='id_blu')
+    id_category = models.ForeignKey(Category, on_delete=models.CASCADE, db_column='fk_id_cat', related_name='dishes')
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     img = models.CharField(max_length=255, blank=True, null=True)
@@ -45,7 +45,7 @@ class Dish(models.Model):
 
 class Ordr(models.Model):
     id_order = models.AutoField(primary_key=True)
-    id_company = models.ForeignKey(Company,on_delete=models.CASCADE,db_column='fk_id_company')
+    id_company = models.ForeignKey(Company, on_delete=models.CASCADE, db_column='fk_id_company')
     delivery_date = models.DateField(db_column='deliverydate')
     delivery_time = models.TimeField(blank=True, null=True, db_column='deliverytime')
     delivery_address = models.TextField(db_column='deliveryaddress')
@@ -60,9 +60,9 @@ class Ordr(models.Model):
 
 
 class OrdrItem(models.Model):
-    id_ordritem = models.AutoField(primary_key=True)
-    id_ordr = models.ForeignKey(Ordr,on_delete=models.CASCADE,db_column='id_ordr')
-    id_dish = models.ForeignKey(Dish,on_delete=models.CASCADE,db_column='fk_id_blu')
+    id_ordritem = models.AutoField(primary_key=True, db_column='id_item')
+    id_ordr = models.ForeignKey(Ordr, on_delete=models.CASCADE, db_column='fk_id_order')
+    id_dish = models.ForeignKey(Dish, on_delete=models.CASCADE, db_column='fk_id_blu')
     quantity = models.IntegerField(default=1)
 
     class Meta:
