@@ -1,11 +1,11 @@
-<!-- templates/core/admin_calendar.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Админ Календарь | ECHO Corp.</title>
+    <title>{{ title }} | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=2">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_orders.css' %}">
 </head>
 <body>
     <div class="header">
@@ -18,69 +18,44 @@
     </div>
 
     <div class="main-content">
-        <div class="container calendar-container">
-            <h2 class="weekday-title">Календарь</h2>
-            <div class="calendar-grid-wrapper">
-                <div class="weekdays-grid">
-                    <div class="weekday">Пн</div>
-                    <div class="weekday">Вт</div>
-                    <div class="weekday">Ср</div>
-                    <div class="weekday">Чт</div>
-                    <div class="weekday">Пт</div>
-                    <div class="weekday">Сб</div>
-                    <div class="weekday">Вс</div>
-                </div>
+        <div class="container">
+            <h2 class="panel-title">{{ title }}</h2>
 
-                <div class="calendar-grid">
-                    {% for i in "0123456"|make_list %}
-                        {% if i|add:"0" < days.0.weekday %}
-                            <div class="empty-cell"></div>
-                        {% endif %}
-                    {% endfor %}
-                    {% for day_info in days %}
-                        <div class="day-btn{% if day_info.is_today %} selected{% endif %}" data-date="{{ day_info.date|date:'Y-m-d' }}">{{ day_info.date.day }}</div>
-                    {% endfor %}
-                </div>
+            <div class="orders-container">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Код</th>
+                            <th>Фирма</th>
+                            <th>Адрес</th>
+                            <th>Номер</th>
+                            <th>Сумма</th>
+                            <th>Время</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.id|default:"—" }}</td>
+                            <td>{{ order.company|default:"—" }}</td>
+                            <td>{{ order.address|default:"—" }}</td>
+                            <td>{{ order.phone|default:"—" }}</td>
+                            <td>{{ order.amount|default:"—" }}₽</td>
+                            <td>{{ order.time|default:"—" }}</td>
+                            <td><button class="delete-btn">🗑️</button></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="empty-orders">Нет заказов</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <form id="calendar-form" method="post">
-                {% csrf_token %}
-                <input type="hidden" id="selected-date" name="selected_date" value="">
-                <button class="accept-button" type="submit">Принять</button>
-            </form>
+            <a href="#" class="add-order-btn">Добавить</a>
         </div>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const dayButtons = document.querySelectorAll('.day-btn');
-            const selectedDateInput = document.getElementById('selected-date');
-
-            function selectDay(button) {
-                dayButtons.forEach(btn => btn.classList.remove('selected'));
-                button.classList.add('selected');
-                selectedDateInput.value = button.getAttribute('data-date');
-            }
-
-            dayButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    selectDay(this);
-                });
-            });
-
-            if (selectedDateInput.value) {
-                const previouslySelectedButton = document.querySelector(`.day-btn[data-date="${selectedDateInput.value}"]`);
-                if (previouslySelectedButton) {
-                    selectDay(previouslySelectedButton);
-                }
-            } else {
-                const today = new Date().toISOString().split('T')[0];
-                const todayButton = document.querySelector(`.day-btn[data-date="${today}"]`);
-                if (todayButton) {
-                    selectDay(todayButton);
-                }
-            }
-        });
-    </script>
 </body>
 </html>

@@ -23,6 +23,10 @@ urlpatterns = [
     path('admin/dish/list/', views.get_dishes_by_category, name='get_dishes_by_category'),
     path('admin/dish/add/', views.add_dish_view, name='add_dish'),
     path('admin/logout/', views.admin_logout_view, name='admin_logout'),
+
+    path('admin/orders/today/', views.admin_orders_today_view, name='admin_orders_today'),
+    path('admin/orders/tomorrow/', views.admin_orders_tomorrow_view, name='admin_orders_tomorrow'),
+
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
 ]

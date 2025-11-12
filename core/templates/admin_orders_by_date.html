@@ -3,9 +3,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Заказы | ECHO Corp.</title>
+    <title>{{ title }} | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=3">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}">
 </head>
 <body>
     <div class="header">
@@ -19,31 +19,36 @@
 
     <div class="main-content">
         <div class="container clients-container">
-            <h2 class="panel-title">Заказы на {{ selected_date|date:"d.m.Y" }}</h2>
+            <h2 class="panel-title">{{ title }}</h2>
 
             {% if orders %}
                 <div style="margin-top: 20px; overflow-x: auto;">
-                    <table style="width: 100%; min-width: 800px; border-collapse: collapse; color: white; background-color: #2c3e50;">
+                    <table style="width: 100%; min-width: 900px; border-collapse: collapse; color: white; background-color: #2c3e50; border-radius: 10px; overflow: hidden;">
                         <thead>
                             <tr style="background-color: #34495e; font-weight: bold;">
-                                <th style="padding: 10px; text-align: left;">ID заказа</th>
-                                <th style="padding: 10px; text-align: left;">Клиент</th>
-                                <th style="padding: 10px; text-align: left;">Адрес доставки</th>
-                                <th style="padding: 10px; text-align: left;">Статус</th>
-                                <th style="padding: 10px; text-align: center;">Действия</th>
+                                <th style="padding: 12px; text-align: center;">Код</th>
+                                <th style="padding: 12px; text-align: center;">Фирма</th>
+                                <th style="padding: 12px; text-align: center;">Адрес</th>
+                                <th style="padding: 12px; text-align: center;">Телефон</th>
+                                <th style="padding: 12px; text-align: center;">Сумма</th>
+                                <th style="padding: 12px; text-align: center;">Время</th>
+                                <th style="padding: 12px; text-align: center;">Действия</th>
                             </tr>
                         </thead>
                         <tbody>
                             {% for order in orders %}
                                 <tr style="border-bottom: 1px solid #34495e;">
-                                    <td style="padding: 10px;">{{ order.id_ordr }}</td>
-                                    <td style="padding: 10px;">{{ order.id_company.name }}</td>
-                                    <td style="padding: 10px;">{{ order.delivery_address }}</td>
-                                    <td style="padding: 10px;">{{ order.status }}</td>
-                                    <td style="padding: 10px; text-align: center;">
-                                        <form method="post" action="{% url 'admin_delete_order' order.id_ordr %}" style="display: inline;">
+                                    <td style="padding: 12px; text-align: center;">{{ order.id|default:"—" }}</td>
+                                    <td style="padding: 12px;">{{ order.company|default:"—" }}</td>
+                                    <td style="padding: 12px;">{{ order.address|default:"—" }}</td>
+                                    <td style="padding: 12px; text-align: center;">{{ order.phone|default:"—" }}</td>
+                                    <td style="padding: 12px; text-align: center;">{{ order.amount|default:"0" }}₽</td>
+                                    <td style="padding: 12px; text-align: center;">{{ order.time|default:"—" }}</td>
+                                    <td style="padding: 12px; text-align: center;">
+                                        <form method="post" action="{% url 'admin_delete_order' order.id %}" style="display: inline;">
                                             {% csrf_token %}
-                                            <button type="submit" style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 18px;" onclick="return confirm('Удалить заказ?')">
+                                            <button type="submit" style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 18px;"
+                                                    onclick="return confirm('Вы уверены, что хотите удалить заказ №{{ order.id }}?')">
                                                 🗑️
                                             </button>
                                         </form>
@@ -54,7 +59,7 @@
                     </table>
                 </div>
             {% else %}
-                <p style="color: #666; text-align: center; margin-top: 30px;">Нет заказов на эту дату.</p>
+                <p style="color: #666; text-align: center; margin-top: 20px;">Нет заказов на выбранную дату</p>
             {% endif %}
 
             <div style="margin-top: 20px;">

@@ -9,7 +9,7 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category, Company, Ordr
+from .models import Dish, Category, Company, Ordr, OrdrItem
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 import os
@@ -296,7 +296,6 @@ def add_to_cart(request):
         dish_id = request.POST.get('dish_id')
         quantity = int(request.POST.get('quantity', 1))
 
-        # ДОБАВИМ ПРОВЕРКУ И ОТЛАДКУ
         print(f"DEBUG: dish_id = '{dish_id}', quantity = {quantity}")
 
         if not dish_id:
@@ -652,3 +651,67 @@ def delete_dish_view(request, dish_id):
             return redirect('admin_menu')
 
     return HttpResponse("Метод не разрешён.", status=405)
+
+
+from django.db.models import Sum, F
+from decimal import Decimal
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_orders_today_view(request):
+    today = datetime.now().date()
+
+    orders = Ordr.objects.filter(delivery_date=today).select_related('id_company')
+
+    order_list = []
+    for order in orders:
+        total_amount = OrdrItem.objects.filter(
+            id_ordr=order
+        ).aggregate(
+            total=Sum(F('quantity') * F('id_dish__price'))
+        )['total'] or Decimal('0.00')
+
+        order_list.append({
+            'id': order.id_order,
+            'company': order.id_company.name,
+            'address': order.delivery_address,
+            'phone': order.id_company.phone,
+            'amount': total_amount,
+            'time': order.delivery_time.strftime('%H:%M') if order.delivery_time else '—',
+            'status': order.status
+        })
+
+    return render(request, 'admin_orders_by_date.html', {
+        'title': 'Заказы на сегодня',
+        'orders': order_list
+    })
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_orders_tomorrow_view(request):
+    tomorrow = datetime.now().date() + timedelta(days=1)
+
+    orders = Ordr.objects.filter(delivery_date=tomorrow).select_related('id_company')
+
+    order_list = []
+    for order in orders:
+        total_amount = OrdrItem.objects.filter(
+            id_ordr=order
+        ).aggregate(
+            total=Sum(F('quantity') * F('id_dish__price'))
+        )['total'] or Decimal('0.00')
+
+        order_list.append({
+            'id': order.id_order,
+            'company': order.id_company.name,
+            'address': order.delivery_address,
+            'phone': order.id_company.phone,
+            'amount': total_amount,
+            'time': order.delivery_time.strftime('%H:%M') if order.delivery_time else '—',
+            'status': order.status
+        })
+
+    return render(request, 'admin_orders_by_date.html', {
+        'title': 'Заказы на завтра',
+        'orders': order_list
+    })

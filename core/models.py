@@ -29,8 +29,7 @@ class Category(models.Model):
 
 class Dish(models.Model):
     id_dish = models.AutoField(primary_key=True,db_column='id_blu')
-    # Добавляем related_name
-    id_category = models.ForeignKey(Category, on_delete=models.CASCADE, db_column='fk_id_cat', related_name='dishes') # <-- related_name='dishes'
+    id_category = models.ForeignKey(Category, on_delete=models.CASCADE, db_column='fk_id_cat', related_name='dishes') 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     img = models.CharField(max_length=255, blank=True, null=True)
