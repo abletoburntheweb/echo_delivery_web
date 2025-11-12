@@ -10,9 +10,15 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
+        {% if messages %}
+            {% for message in messages %}
+                <div style="color: white; margin: 10px 0;">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
         <div class="header-buttons">
-            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
-            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
+            <a href="{% url 'admin_logout' %}" class="profile-button">🚪</a>
+            <a href="{% url 'admin_calendar' %}" class="unused-button">📅</a>
+            <a href="{% url 'admin_panel' %}" class="profile-button">📋</a>
         </div>
     </div>
     <div class="full-screen-menu">

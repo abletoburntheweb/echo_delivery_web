@@ -2,19 +2,19 @@
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
+    background-color: white;
     margin: 0;
     padding: 0;
     display: flex;
     flex-direction: column;
+    align-items: center;
     min-height: 100vh;
     box-sizing: border-box;
 }
 
-
 .header {
     width: 100%;
-    background-color: #2c3e50;
+    background-color: #4A7CBA;
     color: white;
     padding: 15px 20px;
     display: flex;
@@ -35,7 +35,10 @@ body {
     align-items: center;
 }
 
-.profile-button {
+.profile-button,
+.unused-button,
+.faq-icon {
+    background-color: #3A6CA0;
     color: white;
     padding: 5px 10px;
     border-radius: 50%;
@@ -47,25 +50,12 @@ body {
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: none;
-    cursor: pointer;
-    box-sizing: border-box;
 }
 
-.user-icon {
-    background-color: #34495e;
-}
-
-.user-icon:hover {
-    background-color: #1d2c3a;
-}
-
-.admin-icon {
-    background-color: #34495e;
-}
-
-.admin-icon:hover {
-    background-color: #1d2c3a;
+.profile-button:hover,
+.unused-button:hover,
+.faq-icon:hover {
+    background-color: #2C5A8C;
 }
 
 .full-screen-menu {
@@ -79,7 +69,7 @@ body {
 }
 
 .back-button {
-    background-color: #2c3e50;
+    background-color: #4A7CBA;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -93,11 +83,11 @@ body {
 }
 
 .back-button:hover {
-    background-color: #1d2c3a;
+    background-color: #3A6CA0;
 }
 
 .dish-detail-card {
-    background-color: #ecf0f1;
+    background-color: #f8f8f8;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     padding: 20px;
@@ -122,11 +112,11 @@ body {
 .dish-name {
     margin: 0;
     font-size: 24px;
-    color: #2c3e50;
+    color: #4A7CBA;
 }
 
 .save-button {
-    background-color: #2c3e50;
+    background-color: #4A7CBA;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -138,7 +128,7 @@ body {
 }
 
 .save-button:hover {
-    background-color: #1d2c3a;
+    background-color: #3A6CA0;
 }
 
 .image-container {
@@ -158,7 +148,7 @@ body {
 
 .dish-content {
     width: 100%;
-    color: #2c3e50;
+    color: #4A7CBA;
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -167,17 +157,17 @@ body {
 .dish-name-input, .dish-description-input, .dish-price-input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #2c3e50;
+    border: 1px solid #4A7CBA;
     border-radius: 5px;
     background-color: white;
-    color: #2c3e50;
+    color: #333;
     font-size: 16px;
     box-sizing: border-box;
 }
 
 .dish-name-input:focus, .dish-description-input:focus, .dish-price-input:focus {
     outline: none;
-    border-color: #1d2c3a;
+    border-color: #3A6CA0;
 }
 
 .dish-description-input {
@@ -193,15 +183,13 @@ body {
 
 .price-container label {
     font-weight: bold;
-    color: #2c3e50;
+    color: #4A7CBA;
 }
 
 .dish-price-input {
     width: auto;
     align-self: flex-start;
 }
-
-
 
 .quantity-controls {
     display: flex;
@@ -213,16 +201,16 @@ body {
 .quantity-input {
     width: 60px;
     padding: 5px;
-    border: 1px solid #2c3e50;
+    border: 1px solid #4A7CBA;
     border-radius: 5px;
     background-color: white;
-    color: #2c3e50;
+    color: #333;
     font-size: 16px;
     text-align: center;
 }
 
 .add-button {
-    background-color: #2c3e50;
+    background-color: #4A7CBA;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -233,7 +221,7 @@ body {
 }
 
 .add-button:hover {
-    background-color: #1d2c3a;
+    background-color: #3A6CA0;
 }
 
 .action-buttons {
