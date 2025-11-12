@@ -1,3 +1,5 @@
+/* static/core/css/dish_detail.css */
+
 body {
     font-family: Arial, sans-serif;
     background-color: #fdf9f4;
@@ -14,10 +16,41 @@ body {
     background-color: #8b6a50;
     color: white;
     padding: 15px 20px;
-    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 24px;
     font-weight: bold;
     box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.profile-button {
+    background-color: #7a5c45;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.profile-button:hover {
+    background-color: #6a4c3a;
 }
 
 .full-screen-menu {
@@ -41,6 +74,8 @@ body {
     margin-bottom: 20px;
     text-decoration: none;
     transition: background-color 0.2s;
+    display: block;
+    text-align: center;
 }
 
 .back-button:hover {
@@ -84,6 +119,13 @@ body {
     line-height: 1.5;
     margin: 10px 0;
     color: #e0d0c0;
+}
+
+.dish-price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #e0d0c0;
+    margin: 10px 0;
 }
 
 .action-buttons {
