@@ -29,7 +29,7 @@
                 <div class="action-buttons">
                     <form method="post" action="{% url 'add_to_cart' %}">
                         {% csrf_token %}
-                        <input type="hidden" name="dish_id" value="{{ dish.id }}">
+                        <input type="hidden" name="dish_id" value="{{ dish.id_dish }}">
                         <input type="hidden" name="dish_name" value="{{ dish.name }}">
                         <input type="hidden" name="dish_price" value="{{ dish.price }}">
                         <input type="hidden" name="dish_image" value="{{ MEDIA_URL }}{{ dish.img }}">

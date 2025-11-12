@@ -10,7 +10,12 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
-        <a href="{% url 'profile' %}" class="profile-button">👤</a>
+        <div class="header-buttons">
+            <a href="{% url 'cart' %}" class="profile-button">🛒</a>
+            <a href="{% url 'calendar' %}" class="profile-button">📅</a>
+            <span class="unused-button">👤</span>
+            <a href="{% url 'faq' %}" class="profile-button">❓</a>
+        </div>
     </div>
 
     <div class="full-screen-menu">

@@ -35,6 +35,7 @@ body {
 }
 
 .profile-button {
+    background-color: #7a5c45;
     color: white;
     padding: 5px 10px;
     border-radius: 50%;
@@ -46,25 +47,29 @@ body {
     justify-content: center;
     width: 32px;
     height: 32px;
-    border: none;
-    cursor: pointer;
-    box-sizing: border-box;
 }
 
-.user-icon {
-    background-color: #7a5c45;
-}
-
-.user-icon:hover {
+.profile-button:hover {
     background-color: #6a4c3a;
 }
 
-.admin-icon {
-    background-color: #7a5c45;
+.unused-button {
+    background-color: #7A5436;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
 }
 
-.admin-icon:hover {
-    background-color: #6a4c3a;
+.unused-button:hover {
+    background-color: #6A4A2E;
 }
 
 .full-screen-menu {
@@ -76,6 +81,7 @@ body {
     overflow-y: auto;
     box-sizing: border-box;
 }
+
 .search-bar {
     display: flex;
     align-items: center;

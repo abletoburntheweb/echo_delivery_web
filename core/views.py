@@ -285,19 +285,30 @@ def admin_dish_detail_view(request, dish_id):
         'dish': dish,
     })
 
+
 @login_required
 def add_to_cart(request):
     if request.method == 'POST':
         selected_date_str = request.session.get('selected_date')
         if not selected_date_str:
             return redirect('calendar')
+
         dish_id = request.POST.get('dish_id')
         quantity = int(request.POST.get('quantity', 1))
+
+        # ДОБАВИМ ПРОВЕРКУ И ОТЛАДКУ
+        print(f"DEBUG: dish_id = '{dish_id}', quantity = {quantity}")
+
+        if not dish_id:
+            print("ERROR: dish_id is empty!")
+            return redirect('menu')
+
         try:
             dish_obj = Dish.objects.get(id_dish=dish_id)
         except Dish.DoesNotExist:
             print(f"Блюдо с ID {dish_id} не найдено в базе данных при добавлении в корзину")
             return redirect('menu')
+
         all_carts = request.session.get('carts', {})
         cart = all_carts.get(selected_date_str, [])
         found = False

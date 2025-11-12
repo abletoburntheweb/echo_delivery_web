@@ -1,0 +1,336 @@
+/* static/core/css/a_user.css */
+
+/* ==================== */
+/* GLOBAL STYLES        */
+/* ==================== */
+body {
+    font-family: Arial, sans-serif;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+}
+
+/* ==================== */
+/* HEADER COMPONENT     */
+/* ==================== */
+.header {
+    width: 100%;
+    background-color: #8B694D;
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.profile-button {
+    background-color: #7a5c45;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.profile-button:hover {
+    background-color: #6a4c3a;
+}
+
+.unused-button {
+    background-color: #7A5436;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 50%;
+    text-decoration: none;
+    font-size: 16px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
+
+.unused-button:hover {
+    background-color: #6A4A2E;
+}
+
+/* ==================== */
+/* MAIN CONTENT LAYOUT  */
+/* ==================== */
+.main-content {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    width: 100%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.container {
+    background-color: #8B694D;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+    text-align: center;
+    max-width: 500px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* ==================== */
+/* PROFILE STYLES       */
+/* ==================== */
+.container h2 {
+    margin-top: 0;
+    color: white;
+    font-size: 22px;
+}
+
+.container input {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: white;
+    color: #555;
+    text-align: left;
+    font-weight: 500;
+    outline: none;
+    cursor: default;
+}
+
+input[readonly] {
+    -webkit-text-fill-color: #555 !important;
+    opacity: 1;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    width: 100%;
+}
+
+.agreement-link {
+    color: white;
+    text-decoration: underline;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.agreement-link:hover {
+    color: #f0e0d0;
+}
+
+.logout-button {
+    background-color: #7A5436;
+    color: white;
+    border: none;
+    padding: 10px 50px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+    background-color: #6A4A2E;
+}
+
+/* ==================== */
+/* CALENDAR COMPONENT   */
+/* ==================== */
+.month-header {
+    margin: 0 0 20px 0;
+    color: white;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.weekdays-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
+}
+
+.weekday {
+    font-weight: bold;
+    color: white;
+    font-size: 14px;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+    justify-items: center;
+    align-items: center;
+    width: 100%;
+}
+
+.day-btn {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    color: white;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.day-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: white;
+}
+
+.day-btn:active {
+    transform: scale(0.95);
+}
+
+.day-btn.selected {
+    background-color: #7A5436;
+    border-color: white;
+}
+
+/* ==================== */
+/* BUTTONS              */
+/* ==================== */
+.accept-button {
+    background-color: #7A5436;
+    color: white;
+    border: none;
+    padding: 10px 50px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+.accept-button:hover {
+    background-color: #6A4A2E;
+}
+
+.calendar-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.faq-button {
+    background-color: #7A5436;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.faq-button:hover {
+    background-color: #6A4A2E;
+}
+
+/* ==================== */
+/* MODAL STYLES         */
+/* ==================== */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal-content {
+    background-color: #8B694D;
+    color: white;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 700px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
+.close-button {
+    color: white;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close-button:hover {
+    color: #f0e0d0;
+}
+
+.agreement-title {
+    margin-top: 0;
+    font-size: 22px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.agreement-text {
+    text-align: justify;
+    line-height: 1.5;
+    font-size: 16px;
+}
