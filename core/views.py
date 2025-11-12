@@ -722,26 +722,21 @@ def create_order_view(request):
     if request.method == 'POST':
         selected_date_str = request.session.get('selected_date')
         if not selected_date_str:
-            messages.error(request, "Дата доставки не выбрана")
-            return redirect('calendar')
+            return JsonResponse({'success': False, 'error': 'Дата доставки не выбрана'})
 
         try:
             company = Company.objects.get(email=request.user.email)
-
-
             all_carts = request.session.get('carts', {})
             cart_items = all_carts.get(selected_date_str, [])
 
             if not cart_items:
-                messages.error(request, "Корзина пуста")
-                return redirect('cart')
+                return JsonResponse({'success': False, 'error': 'Корзина пуста'})
 
             delivery_address = request.POST.get('address')
             delivery_time = request.POST.get('time')
 
             if not delivery_address or not delivery_time:
-                messages.error(request, "Заполните адрес и время доставки")
-                return redirect('receipt')
+                return JsonResponse({'success': False, 'error': 'Заполните адрес и время доставки'})
 
             with transaction.atomic():
                 order = Ordr.objects.create(
@@ -760,21 +755,17 @@ def create_order_view(request):
                         quantity=item['quantity']
                     )
 
-
                 if selected_date_str in all_carts:
                     del all_carts[selected_date_str]
                     request.session['carts'] = all_carts
                     request.session.modified = True
 
-                messages.success(request, f"Заказ №{order.id_order} успешно оформлен!")
-                return redirect('calendar')
+                return JsonResponse({'success': True, 'order_id': order.id_order})
 
         except Company.DoesNotExist:
-            messages.error(request, "Компания не найдена")
-            return redirect('receipt')
+            return JsonResponse({'success': False, 'error': 'Компания не найдена'})
         except Exception as e:
             print(f"Ошибка создания заказа: {e}")
-            messages.error(request, f"Ошибка оформления заказа: {str(e)}")
-            return redirect('receipt')
+            return JsonResponse({'success': False, 'error': f'Ошибка оформления заказа: {str(e)}'})
 
-    return redirect('receipt')
+    return JsonResponse({'success': False, 'error': 'Метод не разрешен'})
