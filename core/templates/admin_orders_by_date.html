@@ -39,7 +39,12 @@
                             {% for order in orders %}
                                 <tr style="border-bottom: 1px solid #34495e;">
                                     <td style="padding: 12px; text-align: center;">{{ order.id|default:"—" }}</td>
-                                    <td style="padding: 12px;">{{ order.company|default:"—" }}</td>
+                                    <td style="padding: 12px;">
+                                        <a href="{% url 'admin_client_orders' order.company_id %}"
+                                           style="color: white; text-decoration: underline; cursor: pointer;">
+                                            {{ order.company|default:"—" }}
+                                        </a>
+                                    </td>
                                     <td style="padding: 12px;">{{ order.address|default:"—" }}</td>
                                     <td style="padding: 12px; text-align: center;">{{ order.phone|default:"—" }}</td>
                                     <td style="padding: 12px; text-align: center;">{{ order.amount|default:"0" }}₽</td>

@@ -1,0 +1,92 @@
+<!-- templates/core/admin_client_orders.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказы {{ company.name }} | ECHO Corp.</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}">
+</head>
+<body>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+        <div class="header-buttons">
+            <a href="{% url 'admin_logout' %}" class="profile-button">🚪</a>
+            <a href="{% url 'admin_calendar' %}" class="unused-button">📅</a>
+            <a href="{% url 'admin_panel' %}" class="profile-button">📋</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container clients-container">
+            <h2 class="panel-title">Заказы компании: {{ company.name }}</h2>
+
+            <div style="margin-bottom: 20px; color: #666;">
+                <strong>Контакт:</strong> {{ company.phone|default:"—" }} | {{ company.email }}<br>
+                <strong>Адрес:</strong> {{ company.address|default:"—" }}
+            </div>
+
+            {% if orders_by_date %}
+                {% for date_group in orders_by_date %}
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #4A7CBA; border-bottom: 2px solid #4A7CBA; padding-bottom: 5px;">
+                            {{ date_group.date_display }}
+                            {% if date_group.date == today %}
+                                <span style="color: #e74c3c; font-size: 14px;">(сегодня)</span>
+                            {% elif date_group.date == today %}
+                                <span style="color: #f39c12; font-size: 14px;">(завтра)</span>
+                            {% endif %}
+                        </h3>
+
+                        <div style="overflow-x: auto;">
+                            <table style="width: 100%; min-width: 700px; border-collapse: collapse; color: white; background-color: #2c3e50; border-radius: 10px; overflow: hidden;">
+                                <thead>
+                                    <tr style="background-color: #34495e; font-weight: bold;">
+                                        <th style="padding: 12px; text-align: center;">Время</th>
+                                        <th style="padding: 12px; text-align: center;">Адрес доставки</th>
+                                        <th style="padding: 12px; text-align: center;">Сумма</th>
+                                        <th style="padding: 12px; text-align: center;">Статус</th>
+                                        <th style="padding: 12px; text-align: center;">Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for order in date_group.orders %}
+                                        <tr style="border-bottom: 1px solid #34495e;">
+                                            <td style="padding: 12px; text-align: center;">{{ order.time }}</td>
+                                            <td style="padding: 12px;">{{ order.address }}</td>
+                                            <td style="padding: 12px; text-align: center;">{{ order.amount|floatformat:2 }}₽</td>
+                                            <td style="padding: 12px; text-align: center;">
+                                                <span style="color: {% if order.status == 'новый' %}#3498db{% elif order.status == 'подтвержден' %}#27ae60{% elif order.status == 'доставляется' %}#f39c12{% else %}#e74c3c{% endif %};">
+                                                    {{ order.status }}
+                                                </span>
+                                            </td>
+                                            <td style="padding: 12px; text-align: center;">
+                                                <form method="post" action="{% url 'admin_delete_order' order.id %}" style="display: inline;">
+                                                    {% csrf_token %}
+                                                    <button type="submit" style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 18px;"
+                                                            onclick="return confirm('Вы уверены, что хотите удалить заказ №{{ order.id }}?')">
+                                                        🗑️
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div style="text-align: center; color: #666; padding: 40px;">
+                    <p style="font-size: 18px;">У компании нет заказов на будущие даты</p>
+                    <p>Все заказы выполнены или отменены</p>
+                </div>
+            {% endif %}
+
+            <div style="margin-top: 20px;">
+                <a href="{% url 'admin_clients' %}" class="panel-button">Назад к клиентам</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

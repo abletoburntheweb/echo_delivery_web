@@ -197,6 +197,7 @@ def admin_orders_by_date_view(request):
         order_list.append({
             'id': order.id_order,
             'company': order.id_company.name,
+            'company_id': order.id_company.id_company,
             'address': order.delivery_address,
             'phone': order.id_company.phone,
             'amount': total_amount,
@@ -788,3 +789,52 @@ def create_order_view(request):
             return JsonResponse({'success': False, 'error': f'Ошибка оформления заказа: {str(e)}'})
 
     return JsonResponse({'success': False, 'error': 'Метод не разрешен'})
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_client_orders_view(request, company_id):
+    company = get_object_or_404(Company, id_company=company_id)
+
+    today = datetime.now().date()
+
+    future_orders = Ordr.objects.filter(
+        id_company=company,
+        delivery_date__gte=today
+    ).select_related('id_company').order_by('delivery_date', 'delivery_time')
+
+    orders_by_date = {}
+    for order in future_orders:
+        date_str = order.delivery_date.strftime('%Y-%m-%d')
+        if date_str not in orders_by_date:
+            orders_by_date[date_str] = []
+
+        total_amount = OrdrItem.objects.filter(
+            id_ordr=order
+        ).aggregate(
+            total=Sum(F('quantity') * F('id_dish__price'))
+        )['total'] or Decimal('0.00')
+
+        orders_by_date[date_str].append({
+            'id': order.id_order,
+            'time': order.delivery_time.strftime('%H:%M') if order.delivery_time else '—',
+            'address': order.delivery_address,
+            'amount': total_amount,
+            'status': order.status
+        })
+
+    sorted_dates = sorted(orders_by_date.keys())
+
+    orders_display = []
+    for date_str in sorted_dates:
+        date_obj = datetime.strptime(date_str, '%Y-%m-%d').date()
+        orders_display.append({
+            'date': date_obj,
+            'date_display': f"{date_obj.day} {['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'][date_obj.month - 1]} {date_obj.year}",
+            'orders': orders_by_date[date_str]
+        })
+
+    return render(request, 'admin_client_orders.html', {
+        'company': company,
+        'orders_by_date': orders_display,
+        'today': today
+    })
