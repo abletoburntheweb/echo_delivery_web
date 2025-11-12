@@ -17,15 +17,18 @@
     </div>
 
     <div class="full-screen-menu">
-        <a href="{{ previous_url }}" class="back-button">Назад</a>
+        <!-- Изменено: теперь всегда ведёт в admin_menu -->
+        <a href="{% url 'admin_menu' %}" class="back-button">Назад</a>
 
-        <form method="post" action="{% url 'update_dish' dish.id %}" enctype="multipart/form-data" class="dish-detail-card">
+        <form method="post" action="{% url 'update_dish' dish.id_dish %}" enctype="multipart/form-data" class="dish-detail-card">
             {% csrf_token %}
-                <input type="hidden" name="dish_id" value="{{ dish.id }}">
+            <input type="hidden" name="dish_id" value="{{ dish.id_dish }}">
 
             <div class="dish-header">
                 <h2 class="dish-name">{{ dish.name }}</h2>
                 <button type="submit" class="save-button">Сохранить</button>
+                <!-- НОВАЯ КНОПКА УДАЛЕНИЯ -->
+                <button type="button" class="save-button" onclick="confirmDelete()">Удалить</button>
             </div>
 
             <div class="image-container">
@@ -53,7 +56,7 @@
         <div class="action-buttons">
             <form method="post" action="{% url 'add_to_cart' %}">
                 {% csrf_token %}
-                <input type="hidden" name="dish_id" value="{{ dish.id }}">
+                <input type="hidden" name="dish_id" value="{{ dish.id_dish }}">
                 <input type="hidden" name="dish_name" value="{{ dish.name }}">
                 <input type="hidden" name="dish_price" value="{{ dish.price }}">
                 <input type="hidden" name="dish_image" value="{{ dish.image.url }}">
@@ -66,7 +69,20 @@
                 <button type="submit" class="add-button">Добавить в корзину</button>
             </form>
         </div>
+
+        <!-- СКРЫТАЯ ФОРМА ДЛЯ УДАЛЕНИЯ -->
+        <form id="deleteDishForm" method="post" action="{% url 'delete_dish' dish.id_dish %}" style="display: none;">
+            {% csrf_token %}
+        </form>
     </div>
+
+    <script>
+        function confirmDelete() {
+            if (confirm("Вы уверены, что хотите удалить блюдо '{{ dish.name }}'?")) {
+                document.getElementById('deleteDishForm').submit();
+            }
+        }
+    </script>
 
 </body>
 </html>

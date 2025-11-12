@@ -426,7 +426,7 @@ def update_dish(request, dish_id):
             new_name = request.POST.get('name', '').strip()
             new_description = request.POST.get('description', '').strip()
             new_price_str = request.POST.get('price')
-            new_image_path = request.POST.get('image')
+            new_image_file = request.FILES.get('image')
 
             errors = []
             if not new_name:
@@ -441,6 +441,14 @@ def update_dish(request, dish_id):
                 except ValueError:
                     errors.append("Цена должна быть числом.")
 
+            if new_image_file:
+                try:
+                    img = Image.open(new_image_file)
+                    img.verify()
+                    new_image_file.seek(0)
+                except Exception:
+                    errors.append("Новый файл не является изображением.")
+
             if errors:
                 return HttpResponse("; ".join(errors), status=400)
 
@@ -448,8 +456,23 @@ def update_dish(request, dish_id):
             dish.description = new_description
             dish.price = new_price
 
-            if new_image_path is not None:
-                dish.img = new_image_path
+            if new_image_file:
+                 print(f"Обновление файла: {new_image_file.name}, размер: {new_image_file.size} байт, тип: {new_image_file.content_type}")
+                 try:
+                     img = Image.open(new_image_file)
+                     print(f"Формат изображения: {img.format}")
+                     img.verify()
+                     print("Файл прошёл проверку verify().")
+                     new_image_file.seek(0)
+
+                     save_path = os.path.join('dishes', new_image_file.name)
+                     saved_path = default_storage.save(save_path, new_image_file)
+                     dish.img = saved_path
+
+                 except Exception as e:
+                     print(f"Ошибка проверки/сохранения нового изображения: {e}")
+                     errors.append("Загруженный файл не является изображением или не удалось сохранить.")
+                     return HttpResponse("; ".join(errors), status=400)
 
             dish.save()
             return redirect('admin_menu')
@@ -478,8 +501,6 @@ def add_dish_view(request):
                 errors.append("Поле 'Цена' обязательно.")
             if not category_id:
                 errors.append("Поле 'Категория' обязательно.")
-            if not image_file:
-                errors.append("Поле 'Изображение' обязательно.")
 
             price = None
             if price_str:
@@ -498,7 +519,7 @@ def add_dish_view(request):
                     errors.append("Выбранная категория не существует.")
 
             image_path = ""
-            if image_file and not errors:
+            if image_file:
                 print(f"Загруженный файл: {image_file.name}, размер: {image_file.size} байт, тип: {image_file.content_type}")
                 try:
                     img = Image.open(image_file)
@@ -598,3 +619,23 @@ def delete_category_view(request):
             return JsonResponse({'success': False, 'error': 'Внутренняя ошибка сервера.'}, status=500)
 
     return JsonResponse({'success': False, 'error': 'Только POST-запросы разрешены.'}, status=405)
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def delete_dish_view(request, dish_id):
+    if request.method == 'POST':
+        try:
+            dish = get_object_or_404(Dish, id_dish=dish_id)
+            dish_name = dish.name
+            dish.delete()
+            return redirect('admin_menu')
+
+        except Dish.DoesNotExist:
+            messages.error(request, "Блюдо не найдено.")
+            return redirect('admin_menu')
+        except Exception as e:
+            print(f"Ошибка при удалении блюда {dish_id}: {e}")
+            messages.error(request, "Внутренняя ошибка сервера при удалении блюда.")
+            return redirect('admin_menu')
+
+    return redirect('admin_dish_detail', dish_id=dish_id)
