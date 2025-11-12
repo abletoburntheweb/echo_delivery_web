@@ -694,6 +694,7 @@ def admin_orders_today_view(request):
         order_list.append({
             'id': order.id_order,
             'company': order.id_company.name,
+            'company_id': order.id_company.id_company,
             'address': order.delivery_address,
             'phone': order.id_company.phone,
             'amount': total_amount,
@@ -705,7 +706,6 @@ def admin_orders_today_view(request):
         'title': 'Заказы на сегодня',
         'orders': order_list
     })
-
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_orders_tomorrow_view(request):
@@ -724,6 +724,7 @@ def admin_orders_tomorrow_view(request):
         order_list.append({
             'id': order.id_order,
             'company': order.id_company.name,
+            'company_id': order.id_company.id_company,
             'address': order.delivery_address,
             'phone': order.id_company.phone,
             'amount': total_amount,
@@ -735,7 +736,6 @@ def admin_orders_tomorrow_view(request):
         'title': 'Заказы на завтра',
         'orders': order_list
     })
-
 
 @login_required
 def create_order_view(request):
@@ -791,6 +791,38 @@ def create_order_view(request):
     return JsonResponse({'success': False, 'error': 'Метод не разрешен'})
 
 
+@user_passes_test(lambda u: u.is_superuser)
+def get_order_details(request, order_id):
+    try:
+        order = Ordr.objects.get(id_order=order_id)
+        order_items = OrdrItem.objects.filter(id_ordr=order).select_related('id_dish')
+
+        items_list = []
+        total = Decimal('0.00')
+
+        for item in order_items:
+            item_total = item.quantity * item.id_dish.price
+            total += item_total
+            items_list.append({
+                'name': item.id_dish.name,
+                'quantity': item.quantity,
+                'price': str(item.id_dish.price),
+                'total': str(item_total)
+            })
+
+        return JsonResponse({
+            'success': True,
+            'order_id': order_id,
+            'company': order.id_company.name,
+            'delivery_date': order.delivery_date.strftime('%d.%m.%Y'),
+            'delivery_time': order.delivery_time.strftime('%H:%M') if order.delivery_time else '—',
+            'address': order.delivery_address,
+            'items': items_list,
+            'total': str(total)
+        })
+
+    except Ordr.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Заказ не найден'})
 @user_passes_test(lambda u: u.is_superuser)
 def admin_client_orders_view(request, company_id):
     company = get_object_or_404(Company, id_company=company_id)

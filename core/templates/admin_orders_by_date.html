@@ -6,6 +6,50 @@
     <title>{{ title }} | ECHO Corp.</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}">
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #2c3e50;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            color: white;
+            position: relative;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #bdc3c7;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -50,13 +94,20 @@
                                     <td style="padding: 12px; text-align: center;">{{ order.amount|default:"0" }}₽</td>
                                     <td style="padding: 12px; text-align: center;">{{ order.time|default:"—" }}</td>
                                     <td style="padding: 12px; text-align: center;">
-                                        <form method="post" action="{% url 'admin_delete_order' order.id %}" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 18px;"
-                                                    onclick="return confirm('Вы уверены, что хотите удалить заказ №{{ order.id }}?')">
-                                                🗑️
+                                        <div class="action-buttons">
+                                            <button type="button" style="background: none; border: none; cursor: pointer; color: #3498db; font-size: 18px;"
+                                                    onclick="showOrderDetails({{ order.id }})" title="Состав заказа">
+                                                🔍
                                             </button>
-                                        </form>
+
+                                            <form method="post" action="{% url 'admin_delete_order' order.id %}" style="display: inline;">
+                                                {% csrf_token %}
+                                                <button type="submit" style="background: none; border: none; cursor: pointer; color: #e74c3c; font-size: 18px;"
+                                                        onclick="return confirm('Вы уверены, что хотите удалить заказ №{{ order.id }}?')">
+                                                    🗑️
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -67,10 +118,96 @@
                 <p style="color: #666; text-align: center; margin-top: 20px;">Нет заказов на выбранную дату</p>
             {% endif %}
 
+            <div id="orderDetailsModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeOrderDetails()">&times;</span>
+                    <h3>Состав заказа #<span id="modalOrderId"></span></h3>
+
+                    <div id="orderDetailsContent">
+                    </div>
+                </div>
+            </div>
+
             <div style="margin-top: 20px;">
                 <a href="{% url 'admin_calendar' %}" class="panel-button">Назад к календарю</a>
             </div>
         </div>
     </div>
+
+    <script>
+    function showOrderDetails(orderId) {
+        document.getElementById('orderDetailsModal').style.display = 'flex';
+        document.getElementById('modalOrderId').textContent = orderId;
+
+        document.getElementById('orderDetailsContent').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+                Загрузка...
+            </div>
+        `;
+
+        fetch(`/admin/order/${orderId}/details/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    let content = `
+                        <div style="margin-bottom: 15px; background: #34495e; padding: 15px; border-radius: 8px;">
+                            <strong>Компания:</strong> ${data.company}<br>
+                            <strong>Дата:</strong> ${data.delivery_date}<br>
+                            <strong>Время:</strong> ${data.delivery_time}<br>
+                            <strong>Адрес:</strong> ${data.address}
+                        </div>
+                        <div style="background: white; color: #2c3e50; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                            <h4 style="margin-top: 0; color: #2c3e50; text-align: center;">Состав заказа:</h4>
+                    `;
+
+                    data.items.forEach(item => {
+                        content += `
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                                <div>
+                                    <strong>${item.name}</strong><br>
+                                    <small>${item.price}₽ × ${item.quantity}</small>
+                                </div>
+                                <strong>${item.total}₽</strong>
+                            </div>
+                        `;
+                    });
+
+                    content += `
+                            <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: bold; border-top: 2px solid #2c3e50; margin-top: 10px;">
+                                <span>Итого:</span>
+                                <span>${data.total}₽</span>
+                            </div>
+                        </div>
+                    `;
+
+                    document.getElementById('orderDetailsContent').innerHTML = content;
+                } else {
+                    document.getElementById('orderDetailsContent').innerHTML = `
+                        <div style="color: #e74c3c; text-align: center; padding: 20px;">
+                            Ошибка: ${data.error}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('orderDetailsContent').innerHTML = `
+                    <div style="color: #e74c3c; text-align: center; padding: 20px;">
+                        Ошибка загрузки данных
+                    </div>
+                `;
+            });
+    }
+
+    function closeOrderDetails() {
+        document.getElementById('orderDetailsModal').style.display = 'none';
+    }
+
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('orderDetailsModal');
+        if (e.target === modal) {
+            closeOrderDetails();
+        }
+    });
+    </script>
 </body>
 </html>
