@@ -5,292 +5,342 @@
     <meta charset="UTF-8">
     <title>Админ Меню | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=5">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/admin_menu.css' %}">
 </head>
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
         <div class="header-buttons">
-            <a href="{% url 'admin_logout' %}" class="profile-button">🚪</a>
-            <a href="{% url 'admin_calendar' %}" class="unused-button">📅</a>
-            <a href="{% url 'admin_panel' %}" class="profile-button">📋</a>
+            <a href="{% url 'profile' %}" class="profile-button user-icon">👤</a>
+            <a href="{% url 'admin:index' %}" class="profile-button admin-icon">⚙️</a>
         </div>
     </div>
+    <div class="full-screen-menu">
+        <button class="add-dish-btn" onclick="openAddDishModal()">Добавить блюдо</button>
 
-    <div class="main-content">
-        <div class="container menu-container">
-            <h2 class="panel-title">Редактировать позиции</h2>
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Поиск...">
+            <button class="search-btn">🔍</button>
+        </div>
 
-            <div class="categories-panel">
-                <button class="add-category-btn panel-button">Добавить категорию</button>
-                <ul class="categories-list">
-                    {% for category in categories %}
-                        <li class="category-item" data-category-id="{{ category.id_cat }}">
-                            {{ category.name }}
-                            <span class="category-actions">
-                                <button class="edit-category-btn">✏️</button>
-                                <button class="delete-category-btn">🗑️</button>
-                            </span>
-                        </li>
-                    {% endfor %}
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>Категории</h3>
+                <ul id="category-list">
                 </ul>
+                <div class="category-controls">
+                    <button class="add-category-btn" onclick="addCategory()">+</button>
+                    <button class="remove-category-btn" onclick="removeCategory()">-</button>
+                </div>
             </div>
 
-            <div class="dishes-panel">
-                <div class="dishes-header">
-                    <input type="text" id="search-dish" placeholder="Поиск..." class="search-input">
-                    <button class="add-dish-btn panel-button">Добавить блюдо</button>
-                </div>
-
-                <div class="dishes-grid">
-                    {% for dish in dishes %}
-                        <div class="dish-card" data-dish-id="{{ dish.id_blu }}" data-category-id="{{ dish.category.id_cat }}">
-                            <img src="{{ dish.image.url }}" alt="{{ dish.name }}" class="dish-image">
-                            <div class="dish-info">
-                                <div class="dish-name">{{ dish.name }}</div>
-                                <div class="dish-price">{{ dish.price }} ₽</div>
-                            </div>
-                            <div class="dish-actions">
-                                <button class="edit-dish-btn">✏️</button>
-                                <button class="delete-dish-btn">🗑️</button>
-                            </div>
-                        </div>
-                    {% empty %}
-                        <p style="text-align: center; color: #666;">Нет блюд в этой категории.</p>
-                    {% endfor %}
+            <div class="content-area">
+                <div class="menu-grid" id="dish-grid">
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="add-category-modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h3>Добавить категорию</h3>
-            <form id="add-category-form">
-                {% csrf_token %}
-                <input type="text" name="name" placeholder="Название категории" required>
-                <button type="submit">Сохранить</button>
-            </form>
-        </div>
-    </div>
 
-    <div id="add-dish-modal" class="modal" style="display: none;">
+    <div id="addDishModal" class="modal">
         <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h3>Добавить блюдо</h3>
-            <form id="add-dish-form" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="text" name="name" placeholder="Название блюда" required>
-                <textarea name="description" placeholder="Описание"></textarea>
-                <input type="number" name="price" step="0.01" placeholder="Цена" required>
-                <select name="category_id" required>
-                    <option value="">Выберите категорию</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id_cat }}">{{ category.name }}</option>
-                    {% endfor %}
-                </select>
-                <input type="file" name="image" accept="image/*" required>
-                <button type="submit">Сохранить</button>
-            </form>
+            <div class="modal-header">
+                <span class="modal-title">Добавление блюда</span>
+                <button class="close" onclick="closeAddDishModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="addDishForm" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="newDishName">Имя блюда:</label>
+                        <input type="text" id="newDishName" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDishDescription">Описание:</label>
+                        <textarea id="newDishDescription" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDishPrice">Цена:</label>
+                        <input type="number" id="newDishPrice" name="price" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDishCategory">Категория:</label>
+                        <select id="newDishCategory" name="category_id" required>
+                            <option value="">Выберите категорию</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="newDishImage">Изображение:</label>
+                        <input type="file" id="newDishImage" name="image" accept="image/*" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="save-button">Добавить</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 
     <script>
-        // Функция для обновления списка блюд по категории
-        function loadDishesByCategory(categoryId) {
-            fetch(`/admin/dish/list/?category_id=${categoryId}`)
+        let currentCategoryId = null;
+
+        function addCategory() {
+            const newCategoryName = prompt("Введите название новой категории:");
+            if (newCategoryName && newCategoryName.trim() !== "") {
+                fetch("{% url 'add_category' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams({
+                        'name': newCategoryName.trim()
+                    })
+                })
                 .then(response => response.json())
                 .then(data => {
-                    const dishesGrid = document.querySelector('.dishes-grid');
                     if (data.success) {
-                        dishesGrid.innerHTML = '';
-                        data.dishes.forEach(dish => {
-                            const dishCard = document.createElement('div');
-                            dishCard.className = 'dish-card';
-                            dishCard.dataset.dishId = dish.id;
-                            dishCard.dataset.categoryId = dish.category_id;
-                            dishCard.innerHTML = `
-                                <img src="${dish.image}" alt="${dish.name}" class="dish-image">
-                                <div class="dish-info">
-                                    <div class="dish-name">${dish.name}</div>
-                                    <div class="dish-price">${dish.price} ₽</div>
-                                </div>
-                                <div class="dish-actions">
-                                    <button class="edit-dish-btn">✏️</button>
-                                    <button class="delete-dish-btn">🗑️</button>
-                                </div>
-                            `;
-                            dishesGrid.appendChild(dishCard);
+                        const categoryList = document.getElementById("category-list");
+                        const li = document.createElement("li");
+                        li.innerHTML = `<span>${data.category.name}</span>`;
+                        li.dataset.categoryId = data.category.id;
+                        li.addEventListener('click', function() {
+                            selectCategory(this.dataset.categoryId, this.querySelector('span').textContent);
                         });
+                        categoryList.appendChild(li);
+                        updateCategoryOptions();
+                        selectCategory(data.category.id, data.category.name);
                     } else {
-                        dishesGrid.innerHTML = `<p style="text-align: center; color: #666;">${data.error}</p>`;
+                        alert("Ошибка: " + data.error);
                     }
                 })
-                .catch(error => {
-                    console.error('Ошибка загрузки блюд:', error);
+                .catch(err => {
+                    console.error("Ошибка при добавлении категории:", err);
+                    alert("Не удалось добавить категорию. Проверьте консоль.");
                 });
+            }
         }
 
-        // При клике на категорию — загружаем блюда этой категории
+        function removeCategory() {
+            const categoryList = document.getElementById("category-list");
+            const selectedLi = Array.from(categoryList.children).find(li => li.classList.contains('selected'));
+
+            if (!selectedLi) {
+                alert("Пожалуйста, выберите категорию для удаления.");
+                return;
+            }
+
+            const categoryId = selectedLi.dataset.categoryId;
+
+            if (categoryId === 'all') {
+                alert("Нельзя удалить категорию 'Все'.");
+                return;
+            }
+
+            if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
+                fetch("{% url 'delete_category' %}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Accept': 'application/json'
+                    },
+                    body: new URLSearchParams({
+                        'category_id': categoryId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        selectedLi.remove();
+                        updateCategoryOptions();
+                        currentCategoryId = null;
+                        if (document.querySelector('#category-list li[data-category-id="all"]').classList.contains('selected')) {
+                            loadDishes();
+                        } else {
+                            loadDishes();
+                        }
+                    } else {
+                        alert("Ошибка: " + data.error);
+                    }
+                })
+                .catch(err => {
+                    console.error("Ошибка при удалении категории:", err);
+                    alert("Не удалось удалить категорию. Проверьте консоль.");
+                });
+            }
+        }
+
+        function selectCategory(categoryId, categoryName) {
+            const categoryItems = document.querySelectorAll("#category-list li");
+            categoryItems.forEach(item => item.classList.remove('selected'));
+
+            const selectedItem = Array.from(categoryItems).find(item => item.dataset.categoryId === categoryId);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+
+            currentCategoryId = categoryId;
+            loadDishes(categoryId, categoryName);
+        }
+
+        function loadDishes(categoryId = null, categoryName = '') {
+            const dishGrid = document.getElementById("dish-grid");
+            dishGrid.innerHTML = '';
+
+            if (categoryId && categoryId !== 'all') {
+                dishGrid.innerHTML = `<p>Загрузка блюд категории "${categoryName}"...</p>`;
+                const filteredDishes = allDishes.filter(dish => dish.categoryId == categoryId);
+                renderDishes(filteredDishes);
+            } else {
+                dishGrid.innerHTML = '<p>Загрузка всех блюд...</p>';
+                renderDishes(allDishes);
+            }
+        }
+
+        function renderDishes(dishes) {
+            const dishGrid = document.getElementById("dish-grid");
+            dishGrid.innerHTML = '';
+            if (dishes.length === 0) {
+                dishGrid.innerHTML = '<p>Нет блюд для отображения.</p>';
+            } else {
+                dishes.forEach(dish => {
+                    const dishCard = document.createElement('a');
+                    dishCard.href = "{% url 'admin_dish_detail' 0 %}".replace('0', dish.id);
+                    dishCard.className = 'dish-card-link';
+
+                    const card = document.createElement('div');
+                    card.className = 'dish-card';
+
+                    const img = document.createElement('img');
+                    img.src = dish.image;
+                    img.alt = dish.name;
+                    img.className = 'dish-image';
+
+                    const info = document.createElement('div');
+                    info.className = 'dish-info';
+
+                    const name = document.createElement('h3');
+                    name.className = 'dish-name';
+                    name.textContent = dish.name;
+
+                    const price = document.createElement('p');
+                    price.className = 'dish-price';
+                    price.textContent = `${dish.price}₽`;
+
+                    info.appendChild(name);
+                    info.appendChild(price);
+
+                    card.appendChild(img);
+                    card.appendChild(info);
+
+                    dishCard.appendChild(card);
+                    dishGrid.appendChild(dishCard);
+                });
+            }
+        }
+
+        function openAddDishModal() {
+            const modal = document.getElementById("addDishModal");
+            modal.style.display = "flex";
+            document.getElementById('addDishForm').reset();
+        }
+
+        function closeAddDishModal() {
+            const modal = document.getElementById("addDishModal");
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById("addDishModal");
+            if (event.target === modal) {
+                closeAddDishModal();
+            }
+        }
+
+        document.getElementById('addDishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            fetch('{% url "add_dish" %}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeAddDishModal();
+                    location.reload();
+                } else {
+                    alert('Ошибка при добавлении блюда: ' + (data.errors ? data.errors.join(", ") : data.error));
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при подключении к серверу.');
+            });
+        });
+
+        const allDishes = [
+            {% for dish in dishes %}
+                {
+                    id: {{ dish.id_dish }},
+                    name: "{{ dish.name|escapejs }}",
+                    price: {{ dish.price }},
+                    image: "{{ dish.img|escapejs }}",
+                    categoryId: {{ dish.id_category.id_category }}
+                },
+            {% endfor %}
+        ];
+
+        function updateCategoryOptions() {
+            const selectElement = document.getElementById('newDishCategory');
+            selectElement.innerHTML = '<option value="">Выберите категорию</option>';
+
+            const categories = Array.from(document.querySelectorAll("#category-list li")).filter(li => li.dataset.categoryId !== 'all');
+            categories.forEach(li => {
+                const option = document.createElement("option");
+                option.value = li.dataset.categoryId;
+                option.textContent = li.querySelector('span').textContent;
+                selectElement.appendChild(option);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
-            const categoryItems = document.querySelectorAll('.category-item');
-            const addCategoryBtn = document.querySelector('.add-category-btn');
-            const addDishBtn = document.querySelector('.add-dish-btn');
-            const searchInput = document.getElementById('search-dish');
+            const categoryList = document.getElementById("category-list");
 
-            categoryItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    const categoryId = this.dataset.categoryId;
-                    // Убираем выделение со всех категорий
-                    categoryItems.forEach(i => i.classList.remove('active'));
-                    // Добавляем выделение к текущей
-                    this.classList.add('active');
-                    // Загружаем блюда
-                    loadDishesByCategory(categoryId);
+            const allLi = document.createElement("li");
+            allLi.innerHTML = `<span>Все</span>`;
+            allLi.dataset.categoryId = "all";
+            allLi.dataset.categoryName = "Все";
+            allLi.addEventListener('click', function() {
+                selectCategory(this.dataset.categoryId, this.dataset.categoryName);
+            });
+            categoryList.appendChild(allLi);
+
+            const djangoCategories = [
+                {% for cat in categories %}
+                    { id_category: {{ cat.id_category }}, name: "{{ cat.name|escapejs }}" },
+                {% endfor %}
+            ];
+
+            djangoCategories.forEach(cat => {
+                const li = document.createElement("li");
+                li.innerHTML = `<span>${cat.name}</span>`;
+                li.dataset.categoryId = cat.id_category;
+                li.dataset.categoryName = cat.name;
+                li.addEventListener('click', function() {
+                    selectCategory(this.dataset.categoryId, this.dataset.categoryName);
                 });
+                categoryList.appendChild(li);
             });
 
-            // Кнопка "Добавить категорию"
-            addCategoryBtn.addEventListener('click', function() {
-                document.getElementById('add-category-modal').style.display = 'block';
-            });
+            updateCategoryOptions();
 
-            // Кнопка "Добавить блюдо"
-            addDishBtn.addEventListener('click', function() {
-                document.getElementById('add-dish-modal').style.display = 'block';
-            });
-
-            // Поиск блюд
-            searchInput.addEventListener('input', function() {
-                const query = this.value.trim().toLowerCase();
-                const dishCards = document.querySelectorAll('.dish-card');
-                dishCards.forEach(card => {
-                    const name = card.querySelector('.dish-name').textContent.toLowerCase();
-                    card.style.display = name.includes(query) ? 'block' : 'none';
-                });
-            });
-
-            // Закрытие модальных окон
-            document.querySelectorAll('.close-button').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    this.closest('.modal').style.display = 'none';
-                });
-            });
-
-            // Отправка формы добавления категории
-            document.getElementById('add-category-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                fetch('{% url "add_category" %}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Категория успешно добавлена.');
-                        location.reload(); // Перезагружаем страницу для обновления списка
-                    } else {
-                        alert(data.error);
-                    }
-                })
-                .catch(error => {
-                    alert('Ошибка при добавлении категории.');
-                });
-            });
-
-            // Отправка формы добавления блюда
-            document.getElementById('add-dish-form').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                fetch('{% url "add_dish" %}', {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Блюдо успешно добавлено.');
-                        location.reload();
-                    } else {
-                        alert(data.error);
-                    }
-                })
-                .catch(error => {
-                    alert('Ошибка при добавлении блюда.');
-                });
-            });
-
-            // Удаление категории
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('delete-category-btn')) {
-                    const categoryId = e.target.closest('.category-item').dataset.categoryId;
-                    if (confirm('Удалить категорию?')) {
-                        fetch('{% url "delete_category" %}', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                            },
-                            body: JSON.stringify({ category_id: categoryId })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Категория удалена.');
-                                location.reload();
-                            } else {
-                                alert(data.error);
-                            }
-                        })
-                        .catch(error => {
-                            alert('Ошибка при удалении категории.');
-                        });
-                    }
-                }
-            });
-
-            // Удаление блюда
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('delete-dish-btn')) {
-                    const dishId = e.target.closest('.dish-card').dataset.dishId;
-                    if (confirm('Удалить блюдо?')) {
-                        fetch(`/admin/dish/delete/${dishId}/`, {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Блюдо удалено.');
-                                location.reload();
-                            } else {
-                                alert(data.error);
-                            }
-                        })
-                        .catch(error => {
-                            alert('Ошибка при удалении блюда.');
-                        });
-                    }
-                }
-            });
-
-            // Редактирование блюда (пока просто переход на отдельную страницу)
-            document.addEventListener('click', function(e) {
-                if (e.target.classList.contains('edit-dish-btn')) {
-                    const dishId = e.target.closest('.dish-card').dataset.dishId;
-                    window.location.href = `{% url 'update_dish' 0 %}`.replace('0', dishId);
-                }
-            });
+            selectCategory("all", "Все");
         });
     </script>
 </body>

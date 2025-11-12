@@ -264,20 +264,20 @@ def menu_view(request):
         return admin_menu_view(request)
     else:
         categories = Category.objects.all()
-        dishes = Dish.objects.select_related('category').all()
+        dishes = Dish.objects.select_related('id_category').all()
         return render(request, 'menu.html', {'dishes': dishes, 'categories': categories})
 
 @login_required
 def dish_detail_view(request, dish_id):
     print(f"Запрошенное dish_id: {dish_id}")
-    dish = get_object_or_404(Dish, id=dish_id)
+    dish = get_object_or_404(Dish, id_dish=dish_id)
     print(f"Найдено блюдо из базы: {dish}")
     return render(request, 'dish_detail.html', {'dish': dish})
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dish_detail_view(request, dish_id):
     print(f"admin_dish_detail_view вызвана для dish_id: {dish_id}")
-    dish = get_object_or_404(Dish, id=dish_id)
+    dish = get_object_or_404(Dish, id_dish=dish_id)
     return render(request, 'admin_dish_detail.html', {
         'dish': dish,
     })
@@ -291,7 +291,7 @@ def add_to_cart(request):
         dish_id = request.POST.get('dish_id')
         quantity = int(request.POST.get('quantity', 1))
         try:
-            dish_obj = Dish.objects.get(id=dish_id)
+            dish_obj = Dish.objects.get(id_dish=dish_id)
         except Dish.DoesNotExist:
             print(f"Блюдо с ID {dish_id} не найдено в базе данных при добавлении в корзину")
             return redirect('menu')
@@ -305,12 +305,11 @@ def add_to_cart(request):
                 break
 
         if not found:
-            
             cart.append({
-                'id': dish_obj.id,
+                'id': dish_obj.id_dish,
                 'name': dish_obj.name,
                 'price': float(dish_obj.price),
-                'image': dish_obj.image,
+                'image': dish_obj.img,
                 'quantity': quantity
             })
 
@@ -400,7 +399,7 @@ def get_dishes_by_category(request):
     if not category_id:
         return JsonResponse({'success': False, 'error': 'ID категории не передан.'}, status=400)
     try:
-        dishes = Dish.objects.filter(category_id=category_id).select_related('category')
+        dishes = Dish.objects.filter(id_category_id=category_id).select_related('id_category')
         dish_list = []
         for dish in dishes:
             dish_list.append({
@@ -408,18 +407,18 @@ def get_dishes_by_category(request):
                 'name': dish.name,
                 'price': str(dish.price),
                 'image': dish.image.url,
-                'category_id': dish.category.id_cat
+                'category_id': dish.id_category.id_cat
             })
         return JsonResponse({'success': True, 'dishes': dish_list})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
 @login_required
-@user_passes_test(lambda u: u.is_superuser) 
-def update_dish(request, dish_id): 
+@user_passes_test(lambda u: u.is_superuser)
+def update_dish(request, dish_id):
     if request.method == 'POST':
         try:
-            dish = get_object_or_404(Dish, id=dish_id)
+            dish = get_object_or_404(Dish, id_blu=dish_id)
 
             new_name = request.POST.get('name', '').strip()
             new_description = request.POST.get('description', '').strip()
@@ -499,12 +498,13 @@ def add_dish_view(request):
             category = None
             if category_id and not errors:
                 try:
-                    category = Category.objects.get(id=category_id)
+                    category = Category.objects.get(id_cat=category_id)
                 except Category.DoesNotExist:
                     errors.append("Выбранная категория не существует.")
 
             if image_file and not errors:
-                print(f"Загруженный файл: {image_file.name}, размер: {image_file.size} байт, тип: {image_file.content_type}")
+                print(
+                    f"Загруженный файл: {image_file.name}, размер: {image_file.size} байт, тип: {image_file.content_type}")
                 try:
                     img = Image.open(image_file)
                     print(f"Формат изображения: {img.format}")
@@ -522,7 +522,7 @@ def add_dish_view(request):
                 name=name,
                 description=description,
                 price=price,
-                category=category,
+                id_category=category,
                 image=image_file
             )
 
@@ -530,11 +530,11 @@ def add_dish_view(request):
                 'success': True,
                 'message': 'Блюдо успешно добавлено!',
                 'dish': {
-                    'id': new_dish.id,
+                    'id': new_dish.id_blu,
                     'name': new_dish.name,
                     'price': str(new_dish.price),
                     'image': new_dish.image.url,
-                    'category_id': new_dish.category.id
+                    'category_id': new_dish.id_category.id_cat
                 }
             }, status=201)
 
@@ -543,6 +543,7 @@ def add_dish_view(request):
             return JsonResponse({'success': False, 'error': 'Внутренняя ошибка сервера.'}, status=500)
 
     return JsonResponse({'success': False, 'error': 'Метод не разрешён.'}, status=405)
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def add_category_view(request):
@@ -555,7 +556,7 @@ def add_category_view(request):
             category = Category.objects.create(name=name)
             return JsonResponse({
                 'success': True,
-                'category': {'id': category.id, 'name': category.name}
+                'category': {'id': category.id_cat, 'name': category.name}
             })
         except IntegrityError:
             return JsonResponse({'success': False, 'error': 'Категория с таким названием уже существует.'}, status=400)
@@ -563,6 +564,7 @@ def add_category_view(request):
             return JsonResponse({'success': False, 'error': str(e)}, status=400)
 
     return JsonResponse({'success': False, 'error': 'Только POST-запросы разрешены.'}, status=405)
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def delete_category_view(request):
@@ -573,8 +575,8 @@ def delete_category_view(request):
             return JsonResponse({'success': False, 'error': 'ID категории не передан.'}, status=400)
 
         try:
-            category = get_object_or_404(Category, id=category_id)
-            if category.dish_set.exists():
+            category = get_object_or_404(Category, id_cat=category_id)
+            if category.id_category_set.exists():
                 return JsonResponse({
                     'success': False,
                     'error': 'Невозможно удалить категорию, так как с ней связаны блюда.'
