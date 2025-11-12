@@ -11,8 +11,11 @@ from django.urls import reverse
 from datetime import datetime, timedelta
 from .models import Dish, Category, Company, Ordr
 from django.core.exceptions import ValidationError
-
 from django.db import IntegrityError
+import os
+from django.conf import settings
+from django.core.files.storage import default_storage
+
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -403,11 +406,11 @@ def get_dishes_by_category(request):
         dish_list = []
         for dish in dishes:
             dish_list.append({
-                'id': dish.id_blu,
+                'id': dish.id_dish,
                 'name': dish.name,
                 'price': str(dish.price),
-                'image': dish.image.url,
-                'category_id': dish.id_category.id_cat
+                'image': dish.img,
+                'category_id': dish.id_category.id_category
             })
         return JsonResponse({'success': True, 'dishes': dish_list})
     except Exception as e:
@@ -418,12 +421,12 @@ def get_dishes_by_category(request):
 def update_dish(request, dish_id):
     if request.method == 'POST':
         try:
-            dish = get_object_or_404(Dish, id_blu=dish_id)
+            dish = get_object_or_404(Dish, id_dish=dish_id)
 
             new_name = request.POST.get('name', '').strip()
             new_description = request.POST.get('description', '').strip()
             new_price_str = request.POST.get('price')
-            new_image_file = request.FILES.get('image')
+            new_image_path = request.POST.get('image')
 
             errors = []
             if not new_name:
@@ -438,14 +441,6 @@ def update_dish(request, dish_id):
                 except ValueError:
                     errors.append("Цена должна быть числом.")
 
-            if new_image_file and not errors:
-                try:
-                    img = Image.open(new_image_file)
-                    img.verify()
-                    new_image_file.seek(0)
-                except Exception:
-                    errors.append("Новый файл не является изображением.")
-
             if errors:
                 return HttpResponse("; ".join(errors), status=400)
 
@@ -453,8 +448,8 @@ def update_dish(request, dish_id):
             dish.description = new_description
             dish.price = new_price
 
-            if new_image_file:
-                dish.image = new_image_file
+            if new_image_path is not None:
+                dish.img = new_image_path
 
             dish.save()
             return redirect('admin_menu')
@@ -498,22 +493,28 @@ def add_dish_view(request):
             category = None
             if category_id and not errors:
                 try:
-                    category = Category.objects.get(id_cat=category_id)
+                    category = Category.objects.get(id_category=category_id)
                 except Category.DoesNotExist:
                     errors.append("Выбранная категория не существует.")
 
+            image_path = ""
             if image_file and not errors:
-                print(
-                    f"Загруженный файл: {image_file.name}, размер: {image_file.size} байт, тип: {image_file.content_type}")
+                print(f"Загруженный файл: {image_file.name}, размер: {image_file.size} байт, тип: {image_file.content_type}")
                 try:
                     img = Image.open(image_file)
                     print(f"Формат изображения: {img.format}")
                     img.verify()
                     print("Файл прошёл проверку verify().")
                     image_file.seek(0)
+
+                    save_path = os.path.join('dishes', image_file.name)
+
+                    saved_path = default_storage.save(save_path, image_file)
+                    image_path = saved_path
+
                 except Exception as e:
-                    print(f"Ошибка проверки изображения: {e}")
-                    errors.append("Загруженный файл не является изображением.")
+                    print(f"Ошибка проверки/сохранения изображения: {e}")
+                    errors.append("Загруженный файл не является изображением или не удалось сохранить.")
 
             if errors:
                 return JsonResponse({'success': False, 'errors': errors}, status=400)
@@ -523,18 +524,18 @@ def add_dish_view(request):
                 description=description,
                 price=price,
                 id_category=category,
-                image=image_file
+                img=image_path
             )
 
             return JsonResponse({
                 'success': True,
                 'message': 'Блюдо успешно добавлено!',
                 'dish': {
-                    'id': new_dish.id_blu,
+                    'id': new_dish.id_dish,
                     'name': new_dish.name,
                     'price': str(new_dish.price),
-                    'image': new_dish.image.url,
-                    'category_id': new_dish.id_category.id_cat
+                    'image': new_dish.img,
+                    'category_id': new_dish.id_category.id_category
                 }
             }, status=201)
 
@@ -556,7 +557,7 @@ def add_category_view(request):
             category = Category.objects.create(name=name)
             return JsonResponse({
                 'success': True,
-                'category': {'id': category.id_cat, 'name': category.name}
+                'category': {'id': category.id_category, 'name': category.name}
             })
         except IntegrityError:
             return JsonResponse({'success': False, 'error': 'Категория с таким названием уже существует.'}, status=400)
@@ -575,8 +576,8 @@ def delete_category_view(request):
             return JsonResponse({'success': False, 'error': 'ID категории не передан.'}, status=400)
 
         try:
-            category = get_object_or_404(Category, id_cat=category_id)
-            if category.id_category_set.exists():
+            category = get_object_or_404(Category, id_category=category_id)
+            if category.dishes.exists():
                 return JsonResponse({
                     'success': False,
                     'error': 'Невозможно удалить категорию, так как с ней связаны блюда.'
