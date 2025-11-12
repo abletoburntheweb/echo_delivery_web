@@ -18,7 +18,7 @@
 
         <div class="dish-detail-card">
             <div class="image-container">
-                <img src="{{ dish.image.url }}" alt="{{ dish.name }}" class="dish-image">
+                <img src="{{ MEDIA_URL }}{{ dish.img }}" alt="{{ dish.name }}" class="dish-image">
             </div>
 
             <div class="dish-content">
@@ -32,7 +32,7 @@
                         <input type="hidden" name="dish_id" value="{{ dish.id }}">
                         <input type="hidden" name="dish_name" value="{{ dish.name }}">
                         <input type="hidden" name="dish_price" value="{{ dish.price }}">
-                        <input type="hidden" name="dish_image" value="{{ dish.image.url }}">
+                        <input type="hidden" name="dish_image" value="{{ MEDIA_URL }}{{ dish.img }}">
 
                         <div class="quantity-controls">
                             <label for="quantity">Количество:</label>

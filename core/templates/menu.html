@@ -78,7 +78,7 @@
                     card.className = 'dish-card';
 
                     const img = document.createElement('img');
-                    img.src = dish.image;
+                    img.src = "{{ MEDIA_URL }}" + dish.image;
                     img.alt = dish.name;
                     img.className = 'dish-image';
 
@@ -108,18 +108,21 @@
         const allDishes = [
             {% for dish in dishes %}
                 {
-                    id: {{ dish.id }},
+                    id: {{ dish.id_dish }},
                     name: "{{ dish.name|escapejs }}",
                     price: {{ dish.price }},
-                    image: "{{ dish.image.url|escapejs }}",
-                    categoryId: {{ dish.category.id }}
+                    image: "{{ dish.img|escapejs }}",
+                    categoryId: {{ dish.id_category.id_category }}
                 },
             {% endfor %}
         ];
 
         const allCategories = [
             {% for cat in categories %}
-                { id: {{ cat.id }}, name: "{{ cat.name|escapejs }}" },
+                {
+                    id: {{ cat.id_category }},
+                    name: "{{ cat.name|escapejs }}"
+                },
             {% endfor %}
         ];
 
