@@ -628,6 +628,7 @@ def delete_dish_view(request, dish_id):
             dish = get_object_or_404(Dish, id_dish=dish_id)
             dish_name = dish.name
             dish.delete()
+            messages.success(request, f"Блюдо '{dish_name}' успешно удалено.")
             return redirect('admin_menu')
 
         except Dish.DoesNotExist:
@@ -635,7 +636,8 @@ def delete_dish_view(request, dish_id):
             return redirect('admin_menu')
         except Exception as e:
             print(f"Ошибка при удалении блюда {dish_id}: {e}")
-            messages.error(request, "Внутренняя ошибка сервера при удалении блюда.")
+            messages.error(request, f"Ошибка при удалении блюда '{dish_id}': {e}")
+
             return redirect('admin_menu')
 
-    return redirect('admin_dish_detail', dish_id=dish_id)
+    return HttpResponse("Метод не разрешён.", status=405)

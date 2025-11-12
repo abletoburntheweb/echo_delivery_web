@@ -63,7 +63,7 @@ class Ordr(models.Model):
 class OrdrItem(models.Model):
     id_ordritem = models.AutoField(primary_key=True)
     id_ordr = models.ForeignKey(Ordr,on_delete=models.CASCADE,db_column='id_ordr')
-    id_dish = models.ForeignKey(Dish,on_delete=models.CASCADE,db_column='id_dish')
+    id_dish = models.ForeignKey(Dish,on_delete=models.CASCADE,db_column='fk_id_blu')
     quantity = models.IntegerField(default=1)
 
     class Meta:
