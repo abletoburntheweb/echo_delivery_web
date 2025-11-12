@@ -9,7 +9,7 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category, Company, Ordr, OrdrItem
+from .models import Dish, Category, Company, Ordr, OrdrItem, AdminSettings
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 import os
@@ -127,7 +127,17 @@ def calendar_view(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_panel_view(request):
-    return render(request, 'admin_panel.html')
+    work_dates_enabled = get_admin_setting('work_dates_enabled', 'False') == 'True'
+    date_from = get_admin_setting('date_from', '')
+    date_to = get_admin_setting('date_to', '')
+    block_enabled = get_admin_setting('block_enabled', 'False') == 'True'
+
+    return render(request, 'admin_panel.html', {
+        'work_dates_enabled': work_dates_enabled,
+        'date_from': date_from,
+        'date_to': date_to,
+        'block_enabled': block_enabled
+    })
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_clients_view(request):
@@ -870,3 +880,36 @@ def admin_client_orders_view(request, company_id):
         'orders_by_date': orders_display,
         'today': today
     })
+def get_admin_setting(key, default=None):
+    try:
+        setting = AdminSettings.objects.get(key=key)
+        return setting.value
+    except AdminSettings.DoesNotExist:
+        return default
+
+def set_admin_setting(key, value):
+    setting, created = AdminSettings.objects.get_or_create(key=key)
+    setting.value = value
+    setting.save()
+    return setting
+
+
+@user_passes_test(lambda u: u.is_superuser)
+def save_admin_settings(request):
+    if request.method == 'POST':
+        try:
+            work_dates_enabled = request.POST.get('work_dates_enabled') == 'true'
+            date_from = request.POST.get('date_from', '')
+            date_to = request.POST.get('date_to', '')
+            block_enabled = request.POST.get('block_enabled') == 'true'
+
+            set_admin_setting('work_dates_enabled', str(work_dates_enabled))
+            set_admin_setting('date_from', date_from)
+            set_admin_setting('date_to', date_to)
+            set_admin_setting('block_enabled', str(block_enabled))
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Метод не разрешен'})
