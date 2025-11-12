@@ -290,7 +290,7 @@
                     id: {{ dish.id_dish }},
                     name: "{{ dish.name|escapejs }}",
                     price: {{ dish.price }},
-                    image: "{{ dish.img|escapejs }}",
+                    image: "{{ MEDIA_URL }}{{ dish.img|escapejs }}",
                     categoryId: {{ dish.id_category.id_category }}
                 },
             {% endfor %}
