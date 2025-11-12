@@ -1,3 +1,5 @@
+/* static/core/css/faq.css */
+
 body {
     font-family: Arial, sans-serif;
     background-color: #fdf9f4;
@@ -7,6 +9,7 @@ body {
     flex-direction: column;
     min-height: 100vh;
     box-sizing: border-box;
+    position: relative;
 }
 
 .header {
@@ -70,16 +73,16 @@ body {
     background-color: #6A4A2E;
 }
 
-
 .faq-full-container {
     flex-grow: 1;
     background-color: white;
-    padding: 20px;
+    padding: 20px 0;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow-y: auto;
+    padding-bottom: 80px;
 }
 
 .back-button {
@@ -90,7 +93,7 @@ body {
     border-radius: 5px;
     text-decoration: none;
     font-size: 16px;
-    margin-bottom: 15px;
+    margin: 0 0 15px 20px;
     transition: background-color 0.2s;
 }
 
@@ -105,6 +108,9 @@ body {
     font-weight: bold;
     color: #8b6a50;
     text-align: center;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .faq-content {
@@ -113,6 +119,8 @@ body {
     flex-grow: 1;
     overflow-y: auto;
     margin-bottom: 20px;
+    padding: 0 20px;
+    box-sizing: border-box;
 }
 
 .faq-list {
@@ -156,8 +164,13 @@ body {
     background-color: #8b6a50;
     color: white;
     padding: 15px;
-    border-radius: 8px;
+    border-radius: 0;
     text-align: center;
     width: 100%;
     box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
