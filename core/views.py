@@ -411,13 +411,22 @@ def receipt_view(request):
     if not cart_items:
         return redirect('cart')
 
+    # Получаем компанию пользователя для предзаполнения адреса
+    try:
+        company = Company.objects.get(email=request.user.email)
+        company_address = company.address
+    except Company.DoesNotExist:
+        company_address = ""
+
+    # Получаем даты работ
     work_dates = get_work_dates()
 
     return render(request, 'receipt.html', {
         'cart_items': cart_items,
         'total': total,
         'selected_date': selected_date,
-        'work_dates': work_dates
+        'work_dates': work_dates,
+        'company_address': company_address  # Передаем адрес в шаблон
     })
 
 

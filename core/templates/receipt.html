@@ -84,7 +84,7 @@
 
                 <form id="confirmation-form" method="post" action="{% url 'create_order' %}">
                     {% csrf_token %}
-                    <input type="text" id="address" name="address" placeholder="Адрес" required value="{{ user.company.address|default:'' }}"><br>
+                    <input type="text" id="address" name="address" placeholder="Адрес" required value="{{ company_address }}"><br>
                     <input type="text" id="time" name="time" placeholder="Время (00:00)" required><br>
 
                     <div class="checkbox-group">
