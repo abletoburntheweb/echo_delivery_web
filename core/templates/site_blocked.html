@@ -3,35 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <title>Сайт временно недоступен | ECHO Corp.</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: white;
-        }
-        .message {
-            text-align: center;
-            background: rgba(255,255,255,0.1);
-            padding: 40px;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-    </style>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}?v=5">
 </head>
 <body>
-    <div class="message">
-        <h1>Кажется сайт сейчас недоступен.</h1>
-        <p>Возвращайтесь позднее :)</p>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div class="tech-works-info">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+
+        <div class="header-buttons"></div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <div style="text-align: center; color: white; padding: 20px;">
+                <h1 style="font-size: 24px; margin-bottom: 20px; color: white;">Кажется сайт сейчас недоступен.</h1>
+                <p style="font-size: 16px; margin: 0; color: white;">Возвращайтесь позднее :)</p>
+            </div>
+        </div>
     </div>
 </body>
 </html>

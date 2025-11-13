@@ -12,10 +12,17 @@ class BlockSiteMiddleware:
 
         if (block_enabled and
                 not request.path.startswith('/admin/') and
-                not request.path.startswith(settings.STATIC_URL) and
-                not request.path.startswith(settings.MEDIA_URL) and
-                request.path != '/login/'):
-            return render(request, 'site_blocked.html', status=503)
+                not request.path.startswith('/static/') and
+                not request.path.startswith('/media/') and
+                request.path != '/login/' and
+                not request.user.is_superuser):
+
+            from .views import get_work_dates
+            work_dates = get_work_dates()
+
+            return render(request, 'site_blocked.html', {
+                'work_dates': work_dates
+            }, status=503)
 
         response = self.get_response(request)
         return response

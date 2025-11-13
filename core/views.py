@@ -25,7 +25,6 @@ def login_view(request):
         else:
             return redirect('calendar')
 
-    # Получаем даты работ
     work_dates = get_work_dates()
 
     if request.method == 'POST':
@@ -52,7 +51,6 @@ def login_view(request):
     })
 
 def register_view(request):
-    # Получаем даты работ
     work_dates = get_work_dates()
 
     if request.method == 'POST':
@@ -985,7 +983,6 @@ def get_work_dates():
 
 
 def format_date_for_display(datetime_str):
-    """Форматирует datetime строку в дд.мм.гг (без времени)"""
     if not datetime_str:
         return "00.00.00"
 
