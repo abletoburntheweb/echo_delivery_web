@@ -37,7 +37,7 @@
                             <div class="quantity-controls">
                                 <label for="quantity_{{ item.id }}">Кол-во:</label>
                                 <input type="number" id="quantity_{{ item.id }}" name="quantity" value="{{ item.quantity }}" min="1" class="quantity-input"
-                                       data-price="{{ item.price }}" data-id="{{ item.id }}" onchange="updateCartItem(this)">
+                                       data-price="{{ item.price }}" data-id="{{ item.id }}">
                                 <span class="item-price">{{ item.price|floatformat:2 }}₽</span>
                                 <span class="item-total" id="total_{{ item.id }}">{{ item.price|floatformat:2 }}₽</span>
                             </div>
@@ -53,48 +53,42 @@
                 <div class="total">
                     Итого: <span class="total-amount" id="cart-total">{{ total|floatformat:2 }}₽</span>
                 </div>
-               <a href="{% url 'receipt' %}" class="time-button">Подтвердить</a>
+               <a href="{% url 'receipt' %}" class="time-button" onclick="return saveAllChanges()">Подтвердить</a>
             </div>
         </div>
     </div>
 
     <script>
-        // Функция обновления товара в корзине
         function updateCartItem(input) {
             const dishId = input.getAttribute('data-id');
             const quantity = parseInt(input.value) || 0;
             const price = parseFloat(input.getAttribute('data-price'));
 
-            // Обновляем сумму для товара
             const totalElement = document.getElementById('total_' + dishId);
             if (totalElement) {
                 totalElement.textContent = (quantity * price).toFixed(2) + '₽';
             }
 
-            // Обновляем общую сумму
             updateCartTotal();
 
-            // Отправляем запрос на сервер для обновления
             updateCartOnServer(dishId, quantity);
         }
 
-        // Функция удаления товара
         function removeItem(dishId) {
             if (confirm('Удалить товар из корзины?')) {
                 updateCartOnServer(dishId, 0);
 
-                // Удаляем элемент из DOM
                 const itemElement = document.querySelector(`[data-id="${dishId}"]`).closest('.cart-item');
                 if (itemElement) {
                     itemElement.remove();
                 }
 
-                // Обновляем общую сумму
                 updateCartTotal();
+
+                updateItemCount();
             }
         }
 
-        // Функция обновления общей суммы корзины
         function updateCartTotal() {
             let cartTotal = 0;
             const quantityInputs = document.querySelectorAll('.quantity-input');
@@ -111,7 +105,22 @@
             }
         }
 
-        // Функция отправки запроса на сервер
+        function updateItemCount() {
+            const itemCount = document.querySelectorAll('.cart-item').length;
+            const cartTitle = document.querySelector('.cart-title');
+            if (cartTitle) {
+                if (itemCount === 0) {
+                    cartTitle.textContent = 'Корзина пуста';
+                    const cartItems = document.querySelector('.cart-items');
+                    if (cartItems) {
+                        cartItems.innerHTML = '<p class="empty-cart">пока здесь пусто</p>';
+                    }
+                } else {
+                    cartTitle.textContent = `Корзина ${itemCount} позиции`;
+                }
+            }
+        }
+
         function updateCartOnServer(dishId, quantity) {
             const formData = new FormData();
             formData.append('dish_id', dishId);
@@ -121,27 +130,125 @@
                 formData.append('remove', 'true');
             }
 
+            console.log(`Sending to server: dishId=${dishId}, quantity=${quantity}`);
+
             fetch('{% url "update_cart" %}', {
                 method: 'POST',
                 body: formData,
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
-                }
+                },
+                credentials: 'same-origin'
             })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Ошибка при обновлении корзины');
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Server response: success', data);
+                    const input = document.querySelector(`[data-id="${dishId}"]`);
+                    if (input) {
+                        input.setAttribute('data-original', quantity);
+                    }
+                } else {
+                    console.error('Server response: error', data.error);
                 }
             })
             .catch(error => {
-                console.error('Ошибка:', error);
+                console.error('Fetch error:', error);
             });
         }
 
-        // Инициализация сумм при загрузке страницы
+        function saveAllChanges() {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+            let hasChanges = false;
+            let promises = [];
+
+            quantityInputs.forEach(input => {
+                const dishId = input.getAttribute('data-id');
+                const quantity = parseInt(input.value) || 0;
+                const originalQuantity = parseInt(input.getAttribute('data-original')) || 0;
+
+                if (quantity !== originalQuantity) {
+                    hasChanges = true;
+                    const promise = new Promise((resolve) => {
+                        const formData = new FormData();
+                        formData.append('dish_id', dishId);
+                        formData.append('quantity', quantity);
+
+                        fetch('{% url "update_cart" %}', {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            credentials: 'same-origin'
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                input.setAttribute('data-original', quantity);
+                            }
+                            resolve();
+                        })
+                        .catch(() => resolve());
+                    });
+                    promises.push(promise);
+                }
+            });
+
+            if (hasChanges && promises.length > 0) {
+                Promise.all(promises).then(() => {
+                    window.location.href = "{% url 'receipt' %}";
+                });
+                return false;
+            }
+
+            return true;
+        }
+
+        window.addEventListener('beforeunload', function(e) {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+            let hasUnsavedChanges = false;
+
+            quantityInputs.forEach(input => {
+                const quantity = parseInt(input.value) || 0;
+                const originalQuantity = parseInt(input.getAttribute('data-original')) || 0;
+
+                if (quantity !== originalQuantity) {
+                    hasUnsavedChanges = true;
+                }
+            });
+
+            if (hasUnsavedChanges) {
+                e.preventDefault();
+                e.returnValue = 'У вас есть несохраненные изменения в корзине. Вы уверены, что хотите уйти?';
+                return e.returnValue;
+            }
+        });
+
+        function setupAutoSave() {
+            const quantityInputs = document.querySelectorAll('.quantity-input');
+
+            quantityInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    updateCartItem(this);
+                });
+
+                input.addEventListener('change', function() {
+                    updateCartItem(this);
+                });
+
+                input.addEventListener('blur', function() {
+                    updateCartItem(this);
+                });
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const quantityInputs = document.querySelectorAll('.quantity-input');
+
             quantityInputs.forEach(input => {
+                input.setAttribute('data-original', input.value);
+
                 const quantity = parseInt(input.value) || 0;
                 const price = parseFloat(input.getAttribute('data-price'));
                 const totalElement = input.parentNode.querySelector('.item-total');
@@ -149,6 +256,9 @@
                     totalElement.textContent = (quantity * price).toFixed(2) + '₽';
                 }
             });
+
+            setupAutoSave();
+
             updateCartTotal();
         });
     </script>

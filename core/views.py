@@ -271,33 +271,59 @@ def update_cart(request):
     if request.method == 'POST':
         selected_date_str = request.session.get('selected_date')
         if not selected_date_str:
-            return redirect('calendar')
+            return JsonResponse({'success': False, 'error': 'Дата не выбрана'})
 
         dish_id = request.POST.get('dish_id')
         quantity = request.POST.get('quantity')
         remove = request.POST.get('remove')
 
+        print(f"=== UPDATE CART DEBUG ===")
+        print(f"Selected date: {selected_date_str}")
+        print(f"Dish ID: {dish_id} (type: {type(dish_id)}), Quantity: {quantity}, Remove: {remove}")
+        print(f"Session before: {request.session.get('carts', {})}")
+
         all_carts = request.session.get('carts', {})
         cart = all_carts.get(selected_date_str, [])
 
+        print(f"Cart before: {cart}")
+
+        try:
+            dish_id_int = int(dish_id)
+        except (TypeError, ValueError):
+            dish_id_int = dish_id
+
         if remove == 'true' or (quantity and int(quantity) <= 0):
-            cart = [item for item in cart if item['id'] != dish_id]
+            cart = [item for item in cart if str(item['id']) != str(dish_id)]
+            action = 'removed'
+            print(f"Removing item {dish_id}")
         elif quantity:
             found = False
             for item in cart:
-                if item['id'] == dish_id:
+                if str(item['id']) == str(dish_id):
+                    print(f"Updating item {dish_id} from {item['quantity']} to {quantity}")
                     item['quantity'] = int(quantity)
                     found = True
                     break
+            if not found:
+                print(f"Item {dish_id} not found in cart! Available IDs: {[str(item['id']) for item in cart]}")
+            action = 'updated'
 
         all_carts[selected_date_str] = cart
         request.session['carts'] = all_carts
+        request.session.modified = True
+        request.session.save()
 
-    referer = request.META.get('HTTP_REFERER', '')
-    if 'admin/cart' in referer:
-        return redirect('admin_cart')
-    else:
-        return redirect('cart')
+        print(f"Cart after: {cart}")
+        print(f"Session after: {request.session.get('carts', {})}")
+        print(f"=====================")
+
+        return JsonResponse({
+            'success': True,
+            'action': action,
+            'cart_count': len(cart)
+        })
+
+    return JsonResponse({'success': False, 'error': 'Метод не разрешен'})
 
 
 @login_required
@@ -386,6 +412,7 @@ def add_to_cart(request):
 
     return redirect('menu')
 
+
 @login_required
 def receipt_view(request):
     selected_date_str = request.session.get('selected_date')
@@ -395,10 +422,24 @@ def receipt_view(request):
     all_carts = request.session.get('carts', {})
     cart_items = all_carts.get(selected_date_str, [])
 
+    print(f"=== RECEIPT DEBUG ===")
+    print(f"Selected date: {selected_date_str}")
+    print(f"All carts: {all_carts}")
+    print(f"Cart items for date: {cart_items}")
+    print(f"=====================")
+
     total = 0
+    updated_cart_items = []
     for item in cart_items:
         item_total = item['price'] * item['quantity']
-        item['total_price'] = item_total
+        updated_item = {
+            'id': item['id'],
+            'name': item['name'],
+            'price': item['price'],
+            'quantity': item['quantity'],
+            'total_price': item_total
+        }
+        updated_cart_items.append(updated_item)
         total += item_total
 
     selected_date = None
@@ -411,22 +452,20 @@ def receipt_view(request):
     if not cart_items:
         return redirect('cart')
 
-    # Получаем компанию пользователя для предзаполнения адреса
     try:
         company = Company.objects.get(email=request.user.email)
         company_address = company.address
     except Company.DoesNotExist:
         company_address = ""
 
-    # Получаем даты работ
     work_dates = get_work_dates()
 
     return render(request, 'receipt.html', {
-        'cart_items': cart_items,
+        'cart_items': updated_cart_items,
         'total': total,
         'selected_date': selected_date,
         'work_dates': work_dates,
-        'company_address': company_address  # Передаем адрес в шаблон
+        'company_address': company_address
     })
 
 
