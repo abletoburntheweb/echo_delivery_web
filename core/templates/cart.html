@@ -1,3 +1,4 @@
+<!-- templates/core/cart.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,12 +10,20 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
+
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div style="color: white; font-size: 14px; margin: 0 15px;">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+
         <div class="header-buttons">
             <span class="unused-button">📅</span>
             <a href="{% url 'profile' %}" class="profile-button">👤</a>
             <a href="{% url 'faq' %}" class="profile-button">❓</a>
         </div>
     </div>
+
     <div class="main-content">
         <div class="container">
             <h2 class="cart-title">Корзина {{ item_count }} позиции</h2>

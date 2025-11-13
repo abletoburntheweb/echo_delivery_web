@@ -25,10 +25,11 @@ urlpatterns = [
     path('admin/dish/add/', views.add_dish_view, name='add_dish'),
     path('admin/logout/', views.admin_logout_view, name='admin_logout'),
 
+    path('admin/settings/save/', views.save_admin_settings, name='save_admin_settings'),
     path('admin/orders/today/', views.admin_orders_today_view, name='admin_orders_today'),
     path('admin/orders/tomorrow/', views.admin_orders_tomorrow_view, name='admin_orders_tomorrow'),
     path('admin/order/<int:order_id>/details/', views.get_order_details, name='order_details'),
-    path('admin/settings/save/', views.save_admin_settings, name='save_admin_settings'),
+
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
 ]

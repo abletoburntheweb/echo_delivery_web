@@ -9,15 +9,23 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
+
+        <!-- Блок с датами работ в header -->
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div style="color: white; font-size: 14px; margin: 0 15px;">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+
         <div class="header-buttons">
             <span class="unused-button">📅</span>
             <a href="{% url 'profile' %}" class="profile-button">👤</a>
             <a href="{% url 'faq' %}" class="profile-button">❓</a>
         </div>
     </div>
+
     <div class="main-content">
         <div class="container">
-
             <div class="weekdays-grid">
                 <div class="weekday">Пн</div>
                 <div class="weekday">Вт</div>
@@ -61,7 +69,6 @@
 
             const dateValue = button.getAttribute('data-date');
             selectedDateInput.value = dateValue;
-            console.log('Выбрана дата:', dateValue);
         }
 
         dayButtons.forEach(button => {

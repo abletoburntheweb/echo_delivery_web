@@ -1,4 +1,3 @@
-<!-- templates/core/receipt.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -10,6 +9,13 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
+
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div style="color: white; font-size: 14px; margin: 0 15px;">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+
         <a href="{% url 'profile' %}" class="profile-button">👤</a>
     </div>
 

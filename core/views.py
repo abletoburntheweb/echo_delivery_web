@@ -9,9 +9,10 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from datetime import datetime, timedelta
-from .models import Dish, Category, Company, Ordr, OrdrItem, AdminSettings
+from .models import Dish, Category, Company, Ordr, OrdrItem
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.core.cache import cache
 import os
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -105,11 +106,9 @@ def calendar_view(request):
         if selected_date_str:
             try:
                 selected_date = datetime.strptime(selected_date_str, '%Y-%m-%d').date()
-                print(f"Дата выбрана: {selected_date}")
                 request.session['selected_date'] = selected_date_str
                 return redirect('cart')
             except ValueError:
-                print("Неверный формат даты")
                 pass
 
     selected_date_str = request.session.get('selected_date')
@@ -120,24 +119,17 @@ def calendar_view(request):
         except ValueError:
             pass
 
+    work_dates = get_work_dates()
+
     return render(request, 'calendar.html', {
         'days': days,
-        'selected_date': selected_date
+        'selected_date': selected_date,
+        'work_dates': work_dates
     })
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_panel_view(request):
-    work_dates_enabled = get_admin_setting('work_dates_enabled', 'False') == 'True'
-    date_from = get_admin_setting('date_from', '')
-    date_to = get_admin_setting('date_to', '')
-    block_enabled = get_admin_setting('block_enabled', 'False') == 'True'
-
-    return render(request, 'admin_panel.html', {
-        'work_dates_enabled': work_dates_enabled,
-        'date_from': date_from,
-        'date_to': date_to,
-        'block_enabled': block_enabled
-    })
+    return render(request, 'admin_panel.html')
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_clients_view(request):
@@ -246,6 +238,8 @@ def cart_view(request):
     if not cart_items:
         cart_items = None
 
+    work_dates = get_work_dates()
+
     if request.user.is_superuser:
         template_name = 'admin_cart.html'
     else:
@@ -254,7 +248,8 @@ def cart_view(request):
     return render(request, template_name, {
         'cart_items': cart_items,
         'total': total,
-        'item_count': len(cart_items) if cart_items else 0
+        'item_count': len(cart_items) if cart_items else 0,
+        'work_dates': work_dates
     })
 
 @login_required
@@ -298,14 +293,28 @@ def menu_view(request):
     else:
         categories = Category.objects.all()
         dishes = Dish.objects.select_related('id_category').all()
-        return render(request, 'menu.html', {'dishes': dishes, 'categories': categories})
+
+        work_dates = get_work_dates()
+
+        return render(request, 'menu.html', {
+            'dishes': dishes,
+            'categories': categories,
+            'work_dates': work_dates
+        })
+
 
 @login_required
 def dish_detail_view(request, dish_id):
     print(f"Запрошенное dish_id: {dish_id}")
     dish = get_object_or_404(Dish, id_dish=dish_id)
     print(f"Найдено блюдо из базы: {dish}")
-    return render(request, 'dish_detail.html', {'dish': dish})
+
+    work_dates = get_work_dates()
+
+    return render(request, 'dish_detail.html', {
+        'dish': dish,
+        'work_dates': work_dates
+    })
 
 @user_passes_test(lambda u: u.is_superuser)
 def admin_dish_detail_view(request, dish_id):
@@ -388,15 +397,23 @@ def receipt_view(request):
     if not cart_items:
         return redirect('cart')
 
+    work_dates = get_work_dates()
+
     return render(request, 'receipt.html', {
         'cart_items': cart_items,
         'total': total,
-        'selected_date': selected_date
+        'selected_date': selected_date,
+        'work_dates': work_dates
     })
+
 
 @login_required
 def faq_view(request):
-    return render(request, 'faq.html')
+    work_dates = get_work_dates()
+
+    return render(request, 'faq.html', {
+        'work_dates': work_dates
+    })
 
 @login_required
 def profile_view(request):
@@ -409,9 +426,12 @@ def profile_view(request):
     except Company.DoesNotExist:
         company = None
 
+    work_dates = get_work_dates()
+
     context = {
         'user': request.user,
         'company': company,
+        'work_dates': work_dates
     }
 
     if request.user.is_superuser:
@@ -880,18 +900,27 @@ def admin_client_orders_view(request, company_id):
         'orders_by_date': orders_display,
         'today': today
     })
+
 def get_admin_setting(key, default=None):
-    try:
-        setting = AdminSettings.objects.get(key=key)
-        return setting.value
-    except AdminSettings.DoesNotExist:
-        return default
+    return cache.get(f'admin_setting_{key}', default)
 
 def set_admin_setting(key, value):
-    setting, created = AdminSettings.objects.get_or_create(key=key)
-    setting.value = value
-    setting.save()
-    return setting
+    cache.set(f'admin_setting_{key}', value, timeout=None)
+    return True
+
+@user_passes_test(lambda u: u.is_superuser)
+def admin_panel_view(request):
+    work_dates_enabled = get_admin_setting('work_dates_enabled', False)
+    date_from = get_admin_setting('date_from', '')
+    date_to = get_admin_setting('date_to', '')
+    block_enabled = get_admin_setting('block_enabled', False)
+
+    return render(request, 'admin_panel.html', {
+        'work_dates_enabled': work_dates_enabled,
+        'date_from': date_from,
+        'date_to': date_to,
+        'block_enabled': block_enabled
+    })
 
 
 @user_passes_test(lambda u: u.is_superuser)
@@ -903,13 +932,54 @@ def save_admin_settings(request):
             date_to = request.POST.get('date_to', '')
             block_enabled = request.POST.get('block_enabled') == 'true'
 
-            set_admin_setting('work_dates_enabled', str(work_dates_enabled))
+            print(f"СОХРАНЯЕМ НАСТРОЙКИ:")
+            print(f"work_dates_enabled: {work_dates_enabled}")
+            print(f"date_from: '{date_from}'")
+            print(f"date_to: '{date_to}'")
+            print(f"block_enabled: {block_enabled}")
+
+            set_admin_setting('work_dates_enabled', work_dates_enabled)
             set_admin_setting('date_from', date_from)
             set_admin_setting('date_to', date_to)
-            set_admin_setting('block_enabled', str(block_enabled))
+            set_admin_setting('block_enabled', block_enabled)
 
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Метод не разрешен'})
+
+
+def get_work_dates():
+    work_dates_enabled = get_admin_setting('work_dates_enabled', False)
+    date_from = get_admin_setting('date_from', '')
+    date_to = get_admin_setting('date_to', '')
+
+    formatted_from = format_date_for_display(date_from)
+    formatted_to = format_date_for_display(date_to)
+
+    return {
+        'enabled': work_dates_enabled,
+        'from': date_from,
+        'to': date_to,
+        'display_from': formatted_from,
+        'display_to': formatted_to,
+        'display_text': f"ТЕХ РАБОТЫ С: {formatted_from} ПО: {formatted_to}" if work_dates_enabled and date_from and date_to else ""
+    }
+
+
+def format_date_for_display(datetime_str):
+    """Форматирует datetime строку в дд.мм.гг (без времени)"""
+    if not datetime_str:
+        return "00.00.00"
+
+    try:
+        if 'T' in datetime_str:
+            dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+        else:
+            dt = datetime.strptime(datetime_str, '%Y-%m-%d')
+
+        return dt.strftime('%d.%m.%y')
+    except (ValueError, TypeError) as e:
+        print(f"Ошибка форматирования даты '{datetime_str}': {e}")
+        return "00.00.00"

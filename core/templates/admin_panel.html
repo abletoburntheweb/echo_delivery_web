@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Панель управления | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=4">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=5">
 </head>
 <body>
     <div class="header">
@@ -30,9 +30,14 @@
                     <span>Даты работ</span>
                 </label>
                 <div class="date-inputs">
-                    <input type="text" id="date-from" placeholder="с" size="5" value="{{ date_from }}" {% if not work_dates_enabled %}readonly{% endif %}>
+                    <span>с</span>
+                    <input type="date" id="date-from"
+                           value="{{ date_from }}"
+                           {% if not work_dates_enabled %}disabled{% endif %}>
                     <span>по</span>
-                    <input type="text" id="date-to" placeholder="по" size="5" value="{{ date_to }}" {% if not work_dates_enabled %}readonly{% endif %}>
+                    <input type="date" id="date-to"
+                           value="{{ date_to }}"
+                           {% if not work_dates_enabled %}disabled{% endif %}>
                 </div>
             </div>
 
@@ -63,8 +68,8 @@
 
         workDatesToggle.addEventListener('change', function() {
             const isEnabled = this.checked;
-            dateFrom.readOnly = !isEnabled;
-            dateTo.readOnly = !isEnabled;
+            dateFrom.disabled = !isEnabled;
+            dateTo.disabled = !isEnabled;
 
             if (!isEnabled) {
                 dateFrom.value = '';
@@ -79,43 +84,44 @@
         dateFrom.addEventListener('change', saveSettings);
         dateTo.addEventListener('change', saveSettings);
 
-        dateFrom.addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9.]/g, '');
-        });
-
-        dateTo.addEventListener('input', function(e) {
-            this.value = this.value.replace(/[^0-9.]/g, '');
-        });
-
         function saveSettings() {
-            const formData = new FormData();
-            formData.append('work_dates_enabled', workDatesToggle.checked);
-            formData.append('date_from', dateFrom.value);
-            formData.append('date_to', dateTo.value);
-            formData.append('block_enabled', blockToggle.checked);
+        const formData = new FormData();
+        formData.append('work_dates_enabled', workDatesToggle.checked);
+        formData.append('date_from', dateFrom.value || '');
+        formData.append('date_to', dateTo.value || '');
+        formData.append('block_enabled', blockToggle.checked);
 
-            fetch('/admin/settings/save/', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    console.error('Ошибка сохранения настроек:', data.error);
-                }
-            })
-            .catch(error => {
-                console.error('Ошибка:', error);
-            });
-        }
+        console.log('Отправляем данные:', {
+            work_dates_enabled: workDatesToggle.checked,
+            date_from: dateFrom.value,
+            date_to: dateTo.value,
+            block_enabled: blockToggle.checked
+        });
+
+        fetch('/admin/settings/save/', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                console.error('Ошибка сохранения настроек:', data.error);
+            } else {
+                console.log('Настройки сохранены успешно');
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+        });
+    }
 
         let saveTimeout;
         function debounceSave() {
             clearTimeout(saveTimeout);
-            saveTimeout = setTimeout(saveSettings, 1000);
+            saveTimeout = setTimeout(saveSettings, 500);
         }
 
         dateFrom.addEventListener('input', debounceSave);

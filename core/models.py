@@ -70,29 +70,4 @@ class OrdrItem(models.Model):
         verbose_name = 'Позиции заказов'
 
     def __str__(self):
-
-        class AdminSettings(models.Model):
-            key = models.CharField(max_length=100, unique=True, primary_key=True)
-            value = models.TextField(blank=True)
-            updated_at = models.DateTimeField(auto_now=True)
-
-            class Meta:
-                db_table = 'admin_settings'
-                verbose_name = 'Настройка админки'
-                verbose_name_plural = 'Настройки админки'
-
-            def __str__(self):
-                return f"{self.key}: {self.value}"
-
-class AdminSettings(models.Model):
-    key = models.CharField(max_length=100, unique=True, primary_key=True)
-    value = models.TextField(blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'admin_settings'
-        verbose_name = 'Настройка админки'
-        verbose_name_plural = 'Настройки админки'
-
-    def __str__(self):
-        return f"{self.key}: {self.value}"
+        return f"{self.quantity} × {self.id_dish.name} (заказ №{self.id_ordr.id_order})"

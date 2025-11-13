@@ -10,12 +10,20 @@
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
+
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div style="color: white; font-size: 14px; margin: 0 15px;">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+
         <div class="header-buttons">
             <a href="{% url 'calendar' %}" class="profile-button">📅</a>
             <a href="{% url 'profile' %}" class="profile-button">👤</a>
             <span class="unused-button">❓</span>
         </div>
     </div>
+
     <div class="faq-full-container">
         <h2 class="faq-title">Часто задаваемые вопросы</h2>
 
