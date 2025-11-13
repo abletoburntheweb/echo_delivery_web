@@ -1,16 +1,16 @@
+<!-- templates/core/calendar.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Календарь | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_user.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_user.css' %}?v=2">
 </head>
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
 
-        <!-- Блок с датами работ в header -->
         {% if work_dates.enabled and work_dates.display_text %}
         <div style="color: white; font-size: 14px; margin: 0 15px;">
             {{ work_dates.display_text }}
@@ -43,7 +43,13 @@
                     {% endif %}
                 {% endfor %}
                 {% for day_info in days %}
-                    <div class="day-btn{% if day_info.is_today %} selected{% endif %}" data-date="{{ day_info.date|date:'Y-m-d' }}">{{ day_info.date.day }}</div>
+                    <div class="day-btn{% if day_info.is_today %} today{% endif %}{% if day_info.has_orders %} has-orders{% endif %}"
+                         data-date="{{ day_info.date|date:'Y-m-d' }}">
+                        <span class="day-number">{{ day_info.date.day }}</span>
+                        {% if day_info.has_orders %}
+                            <div class="order-indicator"></div>
+                        {% endif %}
+                    </div>
                 {% endfor %}
             </div>
 
@@ -55,7 +61,7 @@
         </div>
     </div>
 
-   <script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
         const dayButtons = document.querySelectorAll('.day-btn');
         const selectedDateInput = document.getElementById('selected-date');
@@ -63,7 +69,6 @@
 
         function selectDay(button) {
             dayButtons.forEach(btn => btn.classList.remove('selected'));
-
             button.classList.add('selected');
             selectedButton = button;
 
@@ -90,6 +95,6 @@
             }
         }
     });
-</script>
+    </script>
 </body>
 </html>

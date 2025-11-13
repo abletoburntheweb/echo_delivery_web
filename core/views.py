@@ -106,13 +106,19 @@ def calendar_view(request):
     current_monday = today - timedelta(days=today.weekday())
     start_date = current_monday + timedelta(weeks=1)
 
+    user_orders_dates = Ordr.objects.filter(
+        id_company__email=request.user.email
+    ).values_list('delivery_date', flat=True)
+
     days = []
     for i in range(14):
         day = start_date + timedelta(days=i)
+        has_orders = day in user_orders_dates
         days.append({
             'date': day,
             'weekday': day.weekday(),
-            'is_today': day == today
+            'is_today': day == today,
+            'has_orders': has_orders
         })
 
     if request.method == 'POST':
