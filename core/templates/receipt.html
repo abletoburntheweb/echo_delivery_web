@@ -16,7 +16,11 @@
         </div>
         {% endif %}
 
-        <a href="{% url 'profile' %}" class="profile-button">👤</a>
+        <div class="header-buttons">
+            <a href="{% url 'calendar' %}" class="profile-button">📅</a>
+            <a href="{% url 'profile' %}" class="profile-button">👤</a>
+            <a href="{% url 'faq' %}" class="profile-button">❓</a>
+        </div>
     </div>
 
     <div class="main-content">
