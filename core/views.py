@@ -709,25 +709,34 @@ def add_category_view(request):
 
     return JsonResponse({'success': False, 'error': 'Только POST-запросы разрешены.'}, status=405)
 
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def delete_category_view(request):
     if request.method == 'POST':
         category_id = request.POST.get('category_id')
+        cascade_delete = request.POST.get('cascade_delete') == 'true'
 
         if not category_id:
             return JsonResponse({'success': False, 'error': 'ID категории не передан.'}, status=400)
 
         try:
             category = get_object_or_404(Category, id_category=category_id)
-            if category.dishes.exists():
-                return JsonResponse({
-                    'success': False,
-                    'error': 'Невозможно удалить категорию, так как с ней связаны блюда.'
-                }, status=400)
 
-            category.delete()
-            return JsonResponse({'success': True})
+            if category.dishes.exists():
+                if cascade_delete:
+                    with transaction.atomic():
+                        category.dishes.all().delete()
+                        category.delete()
+                    return JsonResponse({'success': True, 'message': 'Категория и все блюда удалены'})
+                else:
+                    return JsonResponse({
+                        'success': False,
+                        'error': 'Невозможно удалить категорию, так как с ней связаны блюда.'
+                    }, status=400)
+            else:
+                category.delete()
+                return JsonResponse({'success': True})
 
         except Category.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Категория не найдена.'}, status=404)

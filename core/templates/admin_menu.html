@@ -1,4 +1,3 @@
-<!-- templates/core/admin_menu.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -138,43 +137,89 @@
             }
 
             const categoryId = selectedLi.dataset.categoryId;
+            const categoryName = selectedLi.querySelector('span').textContent;
 
             if (categoryId === 'all') {
                 alert("Нельзя удалить категорию 'Все'.");
                 return;
             }
 
-            if (confirm("Удалить выбранную категорию? Это действие не удаляет блюда.")) {
-                fetch("{% url 'delete_category' %}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                        'Accept': 'application/json'
-                    },
-                    body: new URLSearchParams({
-                        'category_id': categoryId
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        selectedLi.remove();
-                        updateCategoryOptions();
-                        currentCategoryId = null;
-                        if (document.querySelector('#category-list li[data-category-id="all"]').classList.contains('selected')) {
-                            loadDishes();
-                        } else {
-                            loadDishes();
-                        }
-                    } else {
-                        alert("Ошибка: " + data.error);
-                    }
-                })
-                .catch(err => {
-                    console.error("Ошибка при удалении категории:", err);
-                    alert("Не удалось удалить категорию. Проверьте консоль.");
-                });
+            const dishesInCategory = allDishes.filter(dish => dish.categoryId == categoryId);
+
+            if (dishesInCategory.length > 0) {
+                const action = confirm(
+                    `В категории "${categoryName}" есть ${dishesInCategory.length} блюд(о).\n\n` +
+                    "Удалить категорию и все блюда в ней?"
+                );
+
+                if (action) {
+                    deleteCategoryWithDishes(categoryId, selectedLi, dishesInCategory.length);
+                }
+            } else {
+                if (confirm(`Удалить категорию "${categoryName}"?`)) {
+                    deleteCategory(categoryId, selectedLi);
+                }
             }
+        }
+        function deleteCategoryWithDishes(categoryId, selectedLi, dishCount) {
+            fetch("{% url 'delete_category' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Accept': 'application/json'
+                },
+                body: new URLSearchParams({
+                    'category_id': categoryId,
+                    'cascade_delete': 'true'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    selectedLi.remove();
+                    updateCategoryOptions();
+                    currentCategoryId = null;
+
+                    allDishes = allDishes.filter(dish => dish.categoryId != categoryId);
+
+                    loadDishes();
+
+                } else {
+                    alert("Ошибка при удалении: " + data.error);
+                }
+            })
+            .catch(err => {
+                console.error("Ошибка при удалении:", err);
+                alert("Не удалось удалить категорию. Проверьте консоль.");
+            });
+        }
+
+        function deleteCategory(categoryId, selectedLi) {
+            fetch("{% url 'delete_category' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Accept': 'application/json'
+                },
+                body: new URLSearchParams({
+                    'category_id': categoryId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    selectedLi.remove();
+                    updateCategoryOptions();
+                    currentCategoryId = null;
+                    loadDishes();
+                } else {
+                    alert("Ошибка: " + data.error);
+                }
+            })
+            .catch(err => {
+                console.error("Ошибка при удалении категории:", err);
+                alert("Не удалось удалить категорию. Проверьте консоль.");
+            });
         }
 
         function selectCategory(categoryId, categoryName) {
@@ -308,7 +353,7 @@
             });
         });
 
-        const allDishes = [
+        let allDishes = [
             {% for dish in dishes %}
                 {
                     id: {{ dish.id_dish }},
