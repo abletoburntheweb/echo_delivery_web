@@ -1,8 +1,4 @@
 /* static/core/css/a_user.css */
-
-/* ==================== */
-/* GLOBAL STYLES        */
-/* ==================== */
 body {
     font-family: Arial, sans-serif;
     background-color: white;
@@ -15,9 +11,6 @@ body {
     box-sizing: border-box;
 }
 
-/* ==================== */
-/* HEADER COMPONENT     */
-/* ==================== */
 .header {
     width: 100%;
     background-color: #8B694D;
@@ -79,9 +72,6 @@ body {
     background-color: #6A4A2E;
 }
 
-/* ==================== */
-/* MAIN CONTENT LAYOUT  */
-/* ==================== */
 .main-content {
     display: flex;
     justify-content: center;
@@ -103,9 +93,6 @@ body {
     box-sizing: border-box;
 }
 
-/* ==================== */
-/* PROFILE STYLES       */
-/* ==================== */
 .container h2 {
     margin-top: 0;
     color: white;
@@ -168,9 +155,6 @@ input[readonly] {
     background-color: #6A4A2E;
 }
 
-/* ==================== */
-/* CALENDAR COMPONENT   */
-/* ==================== */
 .month-header {
     margin: 0 0 20px 0;
     color: white;
@@ -239,9 +223,6 @@ input[readonly] {
     border-color: white;
 }
 
-/* ==================== */
-/* BUTTONS              */
-/* ==================== */
 .accept-button {
     background-color: #7A5436;
     color: white;
@@ -281,9 +262,6 @@ input[readonly] {
     background-color: #6A4A2E;
 }
 
-/* ==================== */
-/* MODAL STYLES         */
-/* ==================== */
 .modal {
     display: none;
     position: fixed;

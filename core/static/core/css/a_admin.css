@@ -85,7 +85,6 @@ body {
     font-weight: bold;
 }
 
-/* Стиль переключателей (как на макете) */
 .toggle-group {
     display: flex;
     align-items: center;
@@ -194,7 +193,6 @@ input:checked + .toggle-slider:before {
     background-color: #3A6CA0;
 }
 
-/* Календарь */
 .calendar-container {
     background-color: #4A7CBA;
     padding: 25px;

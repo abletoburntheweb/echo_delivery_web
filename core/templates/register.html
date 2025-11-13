@@ -6,19 +6,48 @@
     <title>Регистрация | ECHO Corp.</title>
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}?v=3">
+    <style>
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 15px 0;
+        }
+        .messages li {
+            color: red;
+            text-align: center;
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
-    <div class="header">ECHO Corp.</div>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div style="color: white; font-size: 14px;">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+    </div>
+
     <div class="main-content">
         <div class="container">
             <h2>Регистрация</h2>
+
             {% if messages %}
                 <ul class="messages">
                     {% for message in messages %}
-                        <li style="color: red;">{{ message }}</li>
+                        <li>{{ message }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
+
             <form method="post">
                 {% csrf_token %}
                 <input type="text" name="company_name" placeholder="Название фирмы" required><br>

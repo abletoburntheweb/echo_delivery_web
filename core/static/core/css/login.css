@@ -1,3 +1,4 @@
+/* static/core/css/login.css */
 body {
     font-family: Arial, sans-serif;
     background-color: #fdf9f4;
@@ -12,13 +13,32 @@ body {
 
 .header {
     width: 100%;
-    background-color: #8b6a50;
+    background-color: #8B694D;
     color: white;
     padding: 15px 20px;
-    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     font-size: 24px;
     font-weight: bold;
     box-sizing: border-box;
+}
+
+.header-title {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.tech-works-info {
+    color: white;
+    font-size: 14px;
+    text-align: center;
+    flex-grow: 1;
+}
+
+.header-buttons {
+    width: 96px;
+    flex-shrink: 0;
 }
 
 .main-content {
@@ -79,7 +99,18 @@ button:hover {
     background-color: #6A4A2E;
 }
 
-/* === Стили для ссылок === */
+.error-message {
+    color: #ff6b6b;
+    font-size: 0.9em;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    text-align: center;
+    background: rgba(255, 107, 107, 0.1);
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
 .register-link {
     margin-top: 15px;
     color: white;

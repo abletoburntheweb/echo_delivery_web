@@ -5,22 +5,25 @@
     <meta charset="UTF-8">
     <title>Авторизация | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}?v=3">
-    <style>
-        .error-message {
-            color: red;
-            font-size: 0.9em;
-            margin-top: 5px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}?v=5">
 </head>
 <body>
-    <div class="header">ECHO Corp.</div>
+    <div class="header">
+        <span class="header-title">ECHO Corp.</span>
+
+        {% if work_dates.enabled and work_dates.display_text %}
+        <div class="tech-works-info">
+            {{ work_dates.display_text }}
+        </div>
+        {% endif %}
+        
+        <div class="header-buttons"></div>
+    </div>
+
     <div class="main-content">
         <div class="container">
             <h2>Авторизация</h2>
+
             <form method="post">
                 {% csrf_token %}
                 <input type="text" name="username" placeholder="Почта" required><br>

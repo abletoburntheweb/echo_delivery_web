@@ -35,7 +35,6 @@ body {
     align-items: center;
 }
 
-/* Стили для кнопок навигации (как в a_admin) */
 .profile-button,
 .unused-button,
 .faq-icon {
@@ -59,7 +58,6 @@ body {
     background-color: #2C5A8C;
 }
 
-/* Специфичные стили для админских иконок (если нужны) */
 .user-icon {
     background-color: #3A6CA0;
 }

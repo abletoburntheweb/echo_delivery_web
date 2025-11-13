@@ -25,6 +25,9 @@ def login_view(request):
         else:
             return redirect('calendar')
 
+    # Получаем даты работ
+    work_dates = get_work_dates()
+
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -38,11 +41,20 @@ def login_view(request):
                 return redirect('calendar')
         else:
             error_message = "Неверный логин или пароль"
-            return render(request, 'login.html', {'error_message': error_message})
+            return render(request, 'login.html', {
+                'error_message': error_message,
+                'work_dates': work_dates
+            })
 
-    return render(request, 'login.html', {'error_message': None})
+    return render(request, 'login.html', {
+        'error_message': None,
+        'work_dates': work_dates
+    })
 
 def register_view(request):
+    # Получаем даты работ
+    work_dates = get_work_dates()
+
     if request.method == 'POST':
         company_name = request.POST.get('company_name')
         address = request.POST.get('address')
@@ -56,7 +68,8 @@ def register_view(request):
                 'company_name': company_name,
                 'address': address,
                 'phone': phone,
-                'email': email
+                'email': email,
+                'work_dates': work_dates
             })
 
         try:
@@ -81,10 +94,13 @@ def register_view(request):
                 'company_name': company_name,
                 'address': address,
                 'phone': phone,
-                'email': email
+                'email': email,
+                'work_dates': work_dates
             })
     else:
-        return render(request, 'register.html')
+        return render(request, 'register.html', {
+            'work_dates': work_dates
+        })
 
 @login_required
 def calendar_view(request):
