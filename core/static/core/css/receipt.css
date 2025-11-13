@@ -170,6 +170,7 @@ body {
 .confirm-button:hover {
     background-color: #7a5c45;
 }
+
 .modal {
     display: none;
     position: fixed;
@@ -220,6 +221,35 @@ input[type="text"] {
     border-radius: 20px;
     font-size: 16px;
     box-sizing: border-box;
+    background-color: white;
+    color: #333;
+}
+
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 20px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: white;
+    color: #333;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238b6a50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+}
+
+select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(139, 106, 80, 0.3);
+}
+
+select option {
+    padding: 10px;
     background-color: white;
     color: #333;
 }
