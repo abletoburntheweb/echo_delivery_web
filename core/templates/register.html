@@ -5,35 +5,19 @@
     <meta charset="UTF-8">
     <title>Регистрация | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}?v=3">
-    <style>
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        .messages {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 15px 0;
-        }
-        .messages li {
-            color: red;
-            text-align: center;
-            margin: 5px 0;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/login.css' %}?v=8">
 </head>
 <body>
     <div class="header">
         <span class="header-title">ECHO Corp.</span>
 
         {% if work_dates.enabled and work_dates.display_text %}
-        <div style="color: white; font-size: 14px;">
+        <div class="tech-works-info">
             {{ work_dates.display_text }}
         </div>
         {% endif %}
+
+        <div class="header-buttons"></div>
     </div>
 
     <div class="main-content">
@@ -53,50 +37,110 @@
                 <input type="text" name="company_name" placeholder="Название фирмы" required><br>
                 <input type="text" name="address" placeholder="Адрес компании" required><br>
                 <input type="text" id="phone" name="phone" placeholder="+7(000)000-00-00" required><br>
-                <input type="email" name="email" placeholder="Почта" required   oninvalid="this.setCustomValidity('Пожалуйста, введите корректный email')"
-  oninput="this.setCustomValidity('')"><br>
+                <input type="email" name="email" placeholder="Почта" required oninvalid="this.setCustomValidity('Пожалуйста, введите корректный email')" oninput="this.setCustomValidity('')"><br>
                 <input type="password" name="password" placeholder="Пароль" required><br>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" name="agreement" required>
+                        Я соглашаюсь на обработку персональных данных
+                    </label>
+                </div>
+
                 <button type="submit">Зарегистрироваться</button>
             </form>
             <a href="{% url 'login' %}" class="register-link">Уже есть аккаунт?</a>
         </div>
     </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const phoneInput = document.getElementById('phone');
+
             phoneInput.addEventListener('input', function(e) {
                 let value = e.target.value.replace(/\D/g, '');
-                let formattedValue = '+7(';
+
+                if (value.length > 11) {
+                    value = value.substring(0, 11);
+                }
+
+                let formattedValue = '+7';
                 if (value.length > 1) {
-                    formattedValue += value.substring(1, 4);
+                    formattedValue += '(' + value.substring(1, 4);
                 }
                 if (value.length >= 4) {
                     formattedValue += ')';
-                    if (value.length > 4) {
-                        formattedValue += value.substring(4, 7);
-                    }
-                    if (value.length >= 7) {
-                        formattedValue += '-';
-                        if (value.length > 7) {
-                            formattedValue += value.substring(7, 9);
-                        }
-                        if (value.length >= 9) {
-                            formattedValue += '-';
-                            if (value.length > 9) {
-                                formattedValue += value.substring(9, 11);
-                            }
-                        }
-                    }
                 }
-                if (formattedValue.length <= 18) {
-                    e.target.value = formattedValue;
-                } else {
-                    e.target.value = formattedValue.substring(0, 18);
+                if (value.length > 4) {
+                    formattedValue += value.substring(4, 7);
+                }
+                if (value.length >= 7) {
+                    formattedValue += '-';
+                }
+                if (value.length > 7) {
+                    formattedValue += value.substring(7, 9);
+                }
+                if (value.length >= 9) {
+                    formattedValue += '-';
+                }
+                if (value.length > 9) {
+                    formattedValue += value.substring(9, 11);
+                }
+
+                e.target.value = formattedValue;
+            });
+
+            phoneInput.addEventListener('keydown', function(e) {
+                if (e.key.length > 1) {
+                    return;
+                }
+
+                if (e.ctrlKey || e.metaKey) {
+                    return;
+                }
+
+                if (!/\d/.test(e.key)) {
+                    e.preventDefault();
                 }
             });
-            phoneInput.addEventListener('keypress', function(e) {
-                if (!/\d/.test(e.key) && !(e.key === '+' && e.target.selectionStart === 0)) {
-                    e.preventDefault();
+
+            phoneInput.addEventListener('keyup', function(e) {
+                if (!/\d/.test(e.key)) {
+                    return;
+                }
+
+                const cursorPos = this.selectionStart;
+                const value = this.value;
+
+                if ((cursorPos === 3 || cursorPos === 7 || cursorPos === 11) &&
+                    value.length > cursorPos) {
+                    this.setSelectionRange(cursorPos + 1, cursorPos + 1);
+                }
+            });
+
+            phoneInput.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                const numbers = pastedText.replace(/\D/g, '');
+
+                if (numbers) {
+                    let cleanNumber = numbers.startsWith('8') ? '7' + numbers.substring(1) : numbers;
+                    cleanNumber = cleanNumber.substring(0, 11);
+
+                    this.value = cleanNumber;
+                    this.dispatchEvent(new Event('input'));
+                }
+            });
+
+            phoneInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace') {
+                    const cursorPos = this.selectionStart;
+                    const value = this.value;
+
+                    if (cursorPos === 3 || cursorPos === 7 || cursorPos === 11 || cursorPos === 14) {
+                        e.preventDefault();
+                        this.setSelectionRange(cursorPos - 1, cursorPos - 1);
+                    }
                 }
             });
         });
