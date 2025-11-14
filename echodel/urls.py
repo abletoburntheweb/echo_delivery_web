@@ -3,10 +3,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from core import views
 
 urlpatterns = [
+    path('api/', include('api.urls')),
+    path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
     path('admin/dish/update/<int:dish_id>/', views.update_dish, name='update_dish'),
     path('admin/panel/', views.admin_panel_view, name='admin_panel'),
     path('admin/clients/', views.admin_clients_view, name='admin_clients'),
