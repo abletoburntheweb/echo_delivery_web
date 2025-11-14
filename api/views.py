@@ -126,11 +126,22 @@ def login_user(request):
 
 
 @api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def get_user_orders(request):
     try:
-        company = Company.objects.get(email=request.user.email)
+        print('📨 Получен запрос на заказы:', request.GET)
 
+        email = request.GET.get('email')
+        if not email:
+            print('❌ Email не передан в параметрах')
+            return Response(
+                {'error': 'Email parameter required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        print(f'🔍 Ищем компанию по email: {email}')
+
+        company = Company.objects.get(email=email)
         orders = Ordr.objects.filter(id_company=company)
 
         order_dates = [
@@ -139,29 +150,42 @@ def get_user_orders(request):
             if order.delivery_date
         ]
 
+        print(f'✅ Найдено заказов: {len(order_dates)}')
+
         return Response({
             'order_dates': order_dates,
             'company_id': company.id_company
         })
 
     except Company.DoesNotExist:
+        print(f'❌ Компания с email {email} не найдена')
         return Response(
             {'error': 'Компания не найдена'},
             status=status.HTTP_404_NOT_FOUND
         )
     except Exception as e:
+        print(f'🔴 Ошибка сервера: {str(e)}')
+        import traceback
+        print(f'🔴 Traceback: {traceback.format_exc()}')
         return Response(
             {'error': f'Ошибка сервера: {str(e)}'},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
 @api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
+@permission_classes([permissions.AllowAny])
 def create_order(request):
     try:
         print('📦 Создание заказа из Flutter:', request.data)
 
-        company = Company.objects.get(email=request.user.email)
+        email = request.data.get('email')
+        if not email:
+            return Response(
+                {'error': 'Email required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        company = Company.objects.get(email=email)
 
         order_data = request.data
         order = Ordr.objects.create(
