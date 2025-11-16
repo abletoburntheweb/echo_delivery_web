@@ -10,13 +10,21 @@ class BlockSiteMiddleware:
     def __call__(self, request):
         block_enabled = cache.get('admin_setting_block_enabled', False)
 
-        if (block_enabled and
-                not request.path.startswith('/admin/') and
-                not request.path.startswith('/static/') and
-                not request.path.startswith('/media/') and
-                request.path != '/login/' and
-                not request.user.is_superuser):
+        excluded_paths = [
+            '/api/',
+            '/admin/',
+            '/static/',
+            '/media/',
+            '/login/'
+        ]
 
+        if any(request.path.startswith(path) for path in excluded_paths):
+            return self.get_response(request)
+
+        if hasattr(request, 'user') and request.user.is_superuser:
+            return self.get_response(request)
+
+        if block_enabled:
             from .views import get_work_dates
             work_dates = get_work_dates()
 

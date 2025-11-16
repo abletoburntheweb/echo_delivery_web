@@ -230,6 +230,30 @@ def create_order(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
 
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny])
+def get_site_status(request):
+    try:
+        from core.views import get_work_dates, get_admin_setting
+
+        work_dates = get_work_dates()
+        block_enabled = get_admin_setting('block_enabled', False)
+
+        return Response({
+            'site_blocked': block_enabled,
+            'maintenance_mode': work_dates['enabled'],
+            'maintenance_text': work_dates['display_text']
+        })
+
+    except Exception as e:
+        print(f'🔴 Ошибка получения статуса сайта: {e}')
+        return Response({
+            'site_blocked': False,
+            'maintenance_mode': False,
+            'maintenance_text': ''
+        })
+
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -267,3 +291,4 @@ class OrderViewSet(viewsets.ModelViewSet):
         orders = Ordr.objects.filter(id_company__email=request.user.email)
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data)
+

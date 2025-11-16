@@ -15,4 +15,5 @@ urlpatterns = [
     path('auth/login/', views.login_user, name='login'),
     path('user/orders/', views.get_user_orders, name='user_orders'),
     path('orders/create/', views.create_order, name='create_order'),
+    path('site/status/', views.get_site_status, name='site_status'),
 ]
