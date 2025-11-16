@@ -171,16 +171,22 @@ def delete_client_view(request, company_id):
         return redirect('admin_clients')
     return HttpResponse("Метод не разрешён.", status=405)
 
+
 @user_passes_test(lambda u: u.is_superuser)
 def admin_calendar_view(request):
     today = datetime.now().date()
     days = []
+
     for i in range(21):
         day = today + timedelta(days=i)
+        orders_count = Ordr.objects.filter(delivery_date=day).count()
+
         days.append({
             'date': day,
             'weekday': day.weekday(),
-            'is_today': day == today
+            'is_today': day == today,
+            'orders_count': orders_count,
+            'has_orders': orders_count > 0
         })
 
     if request.method == 'POST':

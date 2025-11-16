@@ -1,11 +1,10 @@
-<!-- templates/core/admin_calendar.html -->
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Админ Календарь | ECHO Corp.</title>
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=2">
+    <link rel="stylesheet" type="text/css" href="{% static 'core/css/a_admin.css' %}?v=5">
 </head>
 <body>
     <div class="header">
@@ -38,7 +37,11 @@
                         {% endif %}
                     {% endfor %}
                     {% for day_info in days %}
-                        <div class="day-btn{% if day_info.is_today %} selected{% endif %}" data-date="{{ day_info.date|date:'Y-m-d' }}">{{ day_info.date.day }}</div>
+                        <div class="day-btn{% if day_info.is_today %} today{% endif %}{% if day_info.has_orders %} has-orders{% endif %}"
+                             data-date="{{ day_info.date|date:'Y-m-d' }}"
+                             title="{% if day_info.has_orders %}Заказов: {{ day_info.orders_count }}{% else %}Нет заказов{% endif %}">
+                            {{ day_info.date.day }}
+                        </div>
                     {% endfor %}
                 </div>
             </div>
